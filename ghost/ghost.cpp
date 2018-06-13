@@ -33,6 +33,7 @@
 #include "socket.h"
 #include "ghostdb.h"
 #include "ghostdbmysql.h"
+#include "ghostw3hmc.h"
 #include "bnet.h"
 #include "map.h"
 #include "packed.h"
@@ -405,6 +406,11 @@ CGHost :: CGHost( CConfig *CFG )
 	CONSOLE_Print( "[GHOST] opening primary database" );
 
 	m_DB = new CGHostDBMySQL( CFG );
+
+	if (CFG->GetInt( "bot_w3hmc", 0 ) == 1)
+		m_W3HMC = new CGHostW3HMC( CFG );
+	else
+		m_W3HMC = NULL;
 
 	// get a list of local IP addresses
 	// this list is used elsewhere to determine if a player connecting to the bot is local or not
@@ -1295,6 +1301,7 @@ void CGHost :: SetConfigs( CConfig *CFG )
 	m_ReconnectWaitTime = CFG->GetInt( "bot_reconnectwaittime", 3 );
 	m_MaxGames = CFG->GetInt( "bot_maxgames", 5 );
 	string BotCommandTrigger = CFG->GetString( "bot_commandtrigger", "!" );
+	m_MaxPlayers = CFG->GetInt( "bot_maxplayers", 12 );
 
 	if( BotCommandTrigger.empty( ) )
 		BotCommandTrigger = "!";
@@ -1353,6 +1360,7 @@ void CGHost :: SetConfigs( CConfig *CFG )
 	m_MapGameType = CFG->GetUInt32( "bot_mapgametype", 21569728 );
 	m_Openstats = CFG->GetInt( "bot_openstats", 0 ) == 0 ? false : true;
 	m_Autoban = CFG->GetInt( "bot_autoban", 0 );
+
 	m_AutobanFirstLeavers = CFG->GetInt( "bot_autobanfirstleavers", 0 );
 	m_AutobanFirstLimit = CFG->GetInt( "bot_autobanfirstlimit", 0 );
 	m_AutobanMinAllies = CFG->GetInt( "bot_autobanminallies", 0 );
@@ -1555,8 +1563,10 @@ void CGHost :: CreateGame( CMap *map, unsigned char gameState, bool saveGame, st
 	else
 		m_CurrentGame = new CGame( this, map, NULL, m_HostPort, gameState, gameName, ownerName, creatorName, creatorServer );
 
-	// todotodo: check if listening failed and report the error to the user
+	if (map->GetMapW3HMCEnabled() && map->GetMapW3HMCBotSlot() >= 0)
+		m_W3HMC->m_PID = m_CurrentGame->CreateFakePlayer(map->GetMapW3HMCBotSlot(), map->GetMapW3HMCBotName()).pid;
 
+	// todotodo: check if listening failed and report the error to the user
 	if( m_SaveGame )
 	{
 		m_CurrentGame->SetEnforcePlayers( m_EnforcePlayers );

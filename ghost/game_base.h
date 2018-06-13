@@ -46,6 +46,7 @@ class CIncomingMapSize;
 class CCallableScoreCheck;
 class CCallableLeagueCheck;
 class CCallableConnectCheck;
+class CCallableDoCURL;
 struct QueuedSpoofAdd;
 struct FakePlayer;
 
@@ -55,15 +56,17 @@ public:
 	CGHost *m_GHost;
 	vector<CGamePlayer *> m_Players;				// vector of players
 	vector<CGameSlot> m_Slots;						// vector of slots
+	queue<CIncomingAction *> m_Actions;				// queue of actions to be sent
 
 protected:
 	CTCPServer *m_Socket;							// listening socket
 	CGameProtocol *m_Protocol;						// game protocol
+	
 	vector<CPotentialPlayer *> m_Potentials;		// vector of potential players (connections that haven't sent a W3GS_REQJOIN packet yet)
 	vector<CCallableScoreCheck *> m_ScoreChecks;
 	vector<CCallableLeagueCheck *> m_LeagueChecks;
 	vector<CCallableConnectCheck *> m_ConnectChecks;	// session validation for entconnect system
-	queue<CIncomingAction *> m_Actions;				// queue of actions to be sent
+	
 	vector<string> m_Reserved;						// vector of player names with reserved slots (from the !hold command)
 	set<string> m_IgnoredNames;						// set of player names to NOT print ban messages for when joining because they've already been printed
 	set<string> m_IPBlackList;						// set of IP addresses to blacklist from joining (todotodo: convert to uint32's for efficiency)
@@ -187,6 +190,7 @@ public:
 	virtual bool GetGameLoaded( )					{ return m_GameLoaded; }
 	virtual bool GetLagging( )						{ return m_Lagging; }
 
+
 	virtual void SetEnforceSlots( vector<CGameSlot> nEnforceSlots )		{ m_EnforceSlots = nEnforceSlots; }
 	virtual void SetEnforcePlayers( vector<PIDPlayer> nEnforcePlayers )	{ m_EnforcePlayers = nEnforcePlayers; }
 	virtual void SetExiting( bool nExiting )							{ m_Exiting = nExiting; }
@@ -231,6 +235,7 @@ public:
 	virtual void SendAllSlotInfo( );
 	virtual void SendVirtualHostPlayerInfo( CGamePlayer *player );
 	virtual void SendFakePlayerInfo( CGamePlayer *player );
+
 	virtual void SendAllActions( );
 	virtual void SendWelcomeMessage( CGamePlayer *player );
 	virtual void SendEndMessage( );
@@ -304,8 +309,8 @@ public:
 	virtual void StopLaggers( string reason );
 	virtual void CreateVirtualHost( );
 	virtual void DeleteVirtualHost( );
-	virtual void CreateFakePlayer( string name = "" );
-	virtual void CreateFakePlayer( unsigned char SID, string name = "" );
+	virtual FakePlayer CreateFakePlayer( string name = "" );
+	virtual FakePlayer CreateFakePlayer( unsigned char SID, string name = "" );
 	virtual void DeleteFakePlayer( );
 	virtual void ShowTeamScores( );
 	virtual string GetJoinedRealm( uint32_t hostcounter );

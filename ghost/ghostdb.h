@@ -75,6 +75,7 @@ class CDBShipsPlayerSummary;
 class CDBSnipePlayerSummary;
 class CDBW3MMDPlayerSummary;
 class CBNET;
+class CIncomingAction;
 
 typedef pair<uint32_t,string> VarP;
 
@@ -163,6 +164,7 @@ public:
 	virtual CCallableW3MMDPlayerSummaryCheck *ThreadedW3MMDPlayerSummaryCheck( string name, string realm, string category );
 	virtual CCallableDownloadAdd *ThreadedDownloadAdd( string map, uint32_t mapsize, string name, string ip, uint32_t spoofed, string spoofedrealm, uint32_t downloadtime );
 	virtual CCallableScoreCheck *ThreadedScoreCheck( string category, string name, string server );
+	//virtual CCallableDoCURL *ThreadedCURL( CIncomingAction* action, string args, CBaseGame *game, string reqId, string reqType, uint32_t value, int gcLen );
 	virtual CCallableLeagueCheck *ThreadedLeagueCheck( string category, string name, string server, string gamename );
 	virtual CCallableGetTournament *ThreadedGetTournament( string gamename );
 	virtual CCallableTournamentChat *ThreadedTournamentChat( uint32_t chatid, string message );
@@ -704,6 +706,30 @@ public:
 	virtual double *GetResult( )					{ return m_Result; }
 	virtual void SetResult( double *nResult )	{ m_Result = nResult; }
 };
+
+/*
+class CCallableDoCURL : virtual public CBaseCallable
+{
+protected:
+	CIncomingAction *m_Action;
+	string m_Args;
+	string m_Result;
+	BYTEARRAY m_ActionData;
+	string m_SpecialReq;
+
+public:
+	CCallableDoCURL( CIncomingAction *nAction, string nArgs, CBaseGame *game, BYTEARRAY nActionData, string nSpecialReq ) : CBaseCallable( ), m_Action( nAction ), m_Args( nArgs ), m_ActionData( nActionData ), m_SpecialReq( nSpecialReq ), m_Result( "" ) { }
+	virtual ~CCallableDoCURL( );
+
+	virtual string GetArgs( )					{ return m_Args; }
+	virtual string GetResult( )					{ return m_Result; }
+	virtual CIncomingAction *GetAction( )		{ return m_Action; }
+	virtual BYTEARRAY GetActionData( )			{ return m_ActionData; }
+	virtual string GetReq( )					{ return m_SpecialReq; }
+
+	virtual void SetResult( string nResult )	{ m_Result = nResult; }
+};
+*/
 
 class CCallableLeagueCheck : virtual public CBaseCallable
 {

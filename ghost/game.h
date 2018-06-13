@@ -63,7 +63,6 @@ protected:
 	vector<CDBBan *> m_DBBans;					// vector of potential ban data for the database (see the Update function for more info, it's not as straightforward as you might think)
 	CDBGame *m_DBGame;							// potential game data for the database
 	vector<CDBGamePlayer *> m_DBGamePlayers;	// vector of potential gameplayer data for the database
-	CStats *m_Stats;							// class to keep track of game stats such as kills/deaths/assists in dota
 	CCallableGetTournament *m_CallableGetTournament; // threaded database tournament info check in progress
 	CCallableGameAdd *m_CallableGameAdd;		// threaded database game addition in progress
 	vector<PairedBanCheck> m_PairedBanChecks;	// vector of paired threaded database ban checks in progress
@@ -103,6 +102,8 @@ public:
 	virtual bool IsGameDataSaved( );
 	virtual void SaveGameData( );
     virtual void GetStatsUser( string *statsUser, string *statsRealm );
+
+    CStats *m_Stats;							// class to keep track of game stats such as kills/deaths/assists in dota
 
 };
 

@@ -29,6 +29,7 @@
 #include "language.h"
 #include "socket.h"
 #include "ghostdb.h"
+#include "ghostw3hmc.h"
 #include "bnet.h"
 #include "map.h"
 #include "packed.h"
@@ -75,6 +76,9 @@ CGame :: CGame( CGHost *nGHost, CMap *nMap, CSaveGame *nSaveGame, uint16_t nHost
 {
     m_DBGame = new CDBGame( 0, string( ), m_Map->GetMapPath( ), string( ), string( ), string( ), 0 );
     m_MapType = "";
+
+    if ( m_Map->GetMapW3HMCEnabled( ) )
+    	m_GHost->m_W3HMC->SetMapData( this, m_Map->GetMapW3HMCGCFilename( ) );
 
 	if( m_Map->GetMapType( ) == "w3mmd" )
 	{
@@ -196,6 +200,27 @@ CGame :: ~CGame( )
 bool CGame :: Update( void *fd, void *send_fd )
 {
 	// update callables
+	if (m_GHost->m_W3HMC != NULL)
+	{
+		for( vector<CCallableDoCURL *> :: iterator i = m_GHost->m_W3HMC->m_SyncOutgoing.begin( ); i != m_GHost->m_W3HMC->m_SyncOutgoing.end( ); )
+		{
+			if( (*i)->GetReady( ) )
+			{
+				string result = (*i)->GetResult( );
+
+				if (result != "noreply")
+					m_GHost->m_W3HMC->SendString((*i)->GetReq() + " " + result);
+
+				m_GHost->m_W3HMC->RecoverCallable( *i );
+				delete *i;
+				i = m_GHost->m_W3HMC->m_SyncOutgoing.erase( i );
+			}
+			else
+			{
+				i++;
+			}
+		}
+	}
 
 	for( vector<PairedBanCheck> :: iterator i = m_PairedBanChecks.begin( ); i != m_PairedBanChecks.end( ); )
 	{
@@ -800,7 +825,7 @@ void CGame :: EventPlayerDeleted( CGamePlayer *player )
 		// possibly autoban if the leave method caused this player to get autoban enabled
 		// and if this player is not observer (and if autobans are enabled)
 		// and if we haven't "soft" ended the game
-		if( m_GHost->m_Autoban && player->GetAutoban( ) && m_GHost->m_AutoHostMaximumGames != 0 && Team != 12 && !m_SoftGameOver )
+		if( m_GHost->m_Autoban && player->GetAutoban( ) && m_GHost->m_AutoHostMaximumGames != 0 && Team != m_GHost->m_MaxPlayers && !m_SoftGameOver )
 		{
 			// ban if game is loading or if it's dota and player has left >= 4v4 situation
 			if( m_GameLoading || ( m_AutobanFirstNumber < m_GHost->m_AutobanFirstLeavers && m_GameTicks < m_GHost->m_AutobanFirstLimit * 1000 ) ) {
@@ -833,7 +858,7 @@ void CGame :: EventPlayerDeleted( CGamePlayer *player )
 		}
 		
 		// set the winner if appropriate, or draw the game
-		if( !m_MapType.empty( ) && m_Stats && m_GameOverTime == 0 && Team != 12 && !m_Stats->IsWinner( ) )
+		if( !m_MapType.empty( ) && m_Stats && m_GameOverTime == 0 && Team != m_GHost->m_MaxPlayers && !m_Stats->IsWinner( ) )
 		{
 			// check if everyone on leaver's team left but other team has more than two players
 			uint32_t CountAlly = 0;
@@ -882,8 +907,10 @@ bool CGame :: EventPlayerAction( CGamePlayer *player, CIncomingAction *action )
 {
 	bool success = CBaseGame :: EventPlayerAction( player, action );
 
-	// give the stats class a chance to process the action
+	if ( success && m_GHost->m_W3HMC != NULL )
+		m_GHost->m_W3HMC->ProcessAction( action );
 
+	// give the stats class a chance to process the action
 	if( success && m_Stats && m_Stats->ProcessAction( action ) && m_GameOverTime == 0 )
 	{
 		CONSOLE_Print( "[GAME: " + m_GameName + "] gameover timer started (stats class reported game over)" );
@@ -1279,7 +1306,7 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
 						{
 							unsigned char SID = (unsigned char)( Slot - 1 );
 
-							if( !( m_Map->GetMapOptions( ) & MAPOPT_FIXEDPLAYERSETTINGS ) && Colour < 12 && SID < m_Slots.size( ) )
+							if( !( m_Map->GetMapOptions( ) & MAPOPT_FIXEDPLAYERSETTINGS ) && Colour < m_GHost->m_MaxPlayers && SID < m_Slots.size( ) )
 							{
 								if( m_Slots[SID].GetSlotStatus( ) == SLOTSTATUS_OCCUPIED && m_Slots[SID].GetComputer( ) == 1 )
 									ColourSlot( SID, Colour );
@@ -1433,7 +1460,7 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
 						{
 							unsigned char SID = (unsigned char)( Slot - 1 );
 
-							if( !( m_Map->GetMapOptions( ) & MAPOPT_FIXEDPLAYERSETTINGS ) && Team < 12 && SID < m_Slots.size( ) )
+							if( !( m_Map->GetMapOptions( ) & MAPOPT_FIXEDPLAYERSETTINGS ) && Team < m_GHost->m_MaxPlayers && SID < m_Slots.size( ) )
 							{
 								if( m_Slots[SID].GetSlotStatus( ) == SLOTSTATUS_OCCUPIED && m_Slots[SID].GetComputer( ) == 1 )
 								{
@@ -2048,7 +2075,7 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
 
 					uint32_t FixedHostCounter = m_HostCounter & 0x0FFFFFFF;
 
-					// we send 12 for SlotsTotal because this determines how many PID's Warcraft 3 allocates
+					// we send 12 (m_GHost->m_MaxPlayers) for SlotsTotal because this determines how many PID's Warcraft 3 allocates
 					// we need to make sure Warcraft 3 allocates at least SlotsTotal + 1 but at most 12 PID's
 					// this is because we need an extra PID for the virtual host player (but we always delete the virtual host player when the 12th person joins)
 					// however, we can't send 13 for SlotsTotal because this causes Warcraft 3 to crash when sharing control of units
@@ -2068,7 +2095,7 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
 						BYTEARRAY MapHeight;
 						MapHeight.push_back( 0 );
 						MapHeight.push_back( 0 );
-						m_GHost->m_UDPSocket->SendTo( IP, Port, m_Protocol->SEND_W3GS_GAMEINFO( m_GHost->m_TFT, m_GHost->m_LANWar3Version, UTIL_CreateByteArray( MapGameType, false ), m_Map->GetMapGameFlags( ), MapWidth, MapHeight, m_GameName, "Varlock", GetTime( ) - m_CreationTime, "Save\\Multiplayer\\" + m_SaveGame->GetFileNameNoPath( ), m_SaveGame->GetMagicNumber( ), 12, 12, m_HostPort, FixedHostCounter, m_EntryKey ) );
+						m_GHost->m_UDPSocket->SendTo( IP, Port, m_Protocol->SEND_W3GS_GAMEINFO( m_GHost->m_TFT, m_GHost->m_LANWar3Version, UTIL_CreateByteArray( MapGameType, false ), m_Map->GetMapGameFlags( ), MapWidth, MapHeight, m_GameName, "Varlock", GetTime( ) - m_CreationTime, "Save\\Multiplayer\\" + m_SaveGame->GetFileNameNoPath( ), m_SaveGame->GetMagicNumber( ), m_GHost->m_MaxPlayers, m_GHost->m_MaxPlayers, m_HostPort, FixedHostCounter, m_EntryKey ) );
 					}
 					else
 					{
@@ -2076,7 +2103,7 @@ bool CGame :: EventPlayerBotCommand( CGamePlayer *player, string command, string
 						// note: we do not use m_Map->GetMapGameType because none of the filters are set when broadcasting to LAN (also as you might expect)
 
 						uint32_t MapGameType = MAPGAMETYPE_UNKNOWN0;
-						m_GHost->m_UDPSocket->SendTo( IP, Port, m_Protocol->SEND_W3GS_GAMEINFO( m_GHost->m_TFT, m_GHost->m_LANWar3Version, UTIL_CreateByteArray( MapGameType, false ), m_Map->GetMapGameFlags( ), m_Map->GetMapWidth( ), m_Map->GetMapHeight( ), m_GameName, "Varlock", GetTime( ) - m_CreationTime, m_Map->GetMapPath( ), m_Map->GetMapCRC( ), 12, 12, m_HostPort, FixedHostCounter, m_EntryKey ) );
+						m_GHost->m_UDPSocket->SendTo( IP, Port, m_Protocol->SEND_W3GS_GAMEINFO( m_GHost->m_TFT, m_GHost->m_LANWar3Version, UTIL_CreateByteArray( MapGameType, false ), m_Map->GetMapGameFlags( ), m_Map->GetMapWidth( ), m_Map->GetMapHeight( ), m_GameName, "Varlock", GetTime( ) - m_CreationTime, m_Map->GetMapPath( ), m_Map->GetMapCRC( ), m_GHost->m_MaxPlayers, m_GHost->m_MaxPlayers, m_HostPort, FixedHostCounter, m_EntryKey ) );
 					}
 				}
 			}

@@ -121,6 +121,13 @@ private:
 	string m_MapType;							// config value: map type (for stats class)
 	string m_MapMatchMakingCategory;			// config value: map matchmaking category (for matchmaking)
 	string m_MapStatsW3MMDCategory;				// config value: map stats w3mmd category (for saving w3mmd stats)
+	string m_MapW3HMCBotName;
+	string m_MapW3HMCGCFilename;
+	string m_MapW3HMCSecret;
+	int m_MapW3HMCEnabled;
+	int m_MapW3HMCBotSlot;
+	char m_MapW3HMCTriggerID1;
+	char m_MapW3HMCTriggerID2;
 	string m_MapDefaultHCL;						// config value: map default HCL to use (this should really be specified elsewhere and not part of the map config)
 	uint32_t m_MapDefaultPlayerScore;			// config value: map default player score (for matchmaking)
 	string m_MapLocalPath;						// config value: map local path
@@ -160,6 +167,13 @@ public:
 	string GetMapType( )					{ return m_MapType; }
 	string GetMapMatchMakingCategory( )		{ return m_MapMatchMakingCategory; }
 	string GetMapStatsW3MMDCategory( )		{ return m_MapStatsW3MMDCategory; }
+	string GetMapW3HMCGCFilename( )			{ return m_MapW3HMCGCFilename; }
+	string GetMapW3HMCSecret( )				{ return m_MapW3HMCSecret; }
+	string GetMapW3HMCBotName( )			{ return m_MapW3HMCBotName; }
+	int GetMapW3HMCBotSlot( )				{ return m_MapW3HMCBotSlot; }
+	bool GetMapW3HMCEnabled( )				{ return m_MapW3HMCEnabled == 1; }
+	char GetMapW3HMCTriggerID1( )			{ return m_MapW3HMCTriggerID1; }
+	char GetMapW3HMCTriggerID2( )			{ return m_MapW3HMCTriggerID2; }
 	string GetMapDefaultHCL( )				{ return m_MapDefaultHCL; }
 	uint32_t GetMapDefaultPlayerScore( )	{ return m_MapDefaultPlayerScore; }
 	string GetMapLocalPath( )				{ return m_MapLocalPath; }

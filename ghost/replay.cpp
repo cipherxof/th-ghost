@@ -302,12 +302,12 @@ void CReplay :: ParseReplay( bool parseBlocks )
 	READSTR( ISS, m_StatString );			// StatString (4.3)
 	READB( ISS, &m_PlayerCount, 4 );		// PlayerCount (4.6)
 
-	if( m_PlayerCount > 12 )
+	/*if( m_PlayerCount > 24 )
 	{
 		CONSOLE_Print( "[REPLAY] invalid replay (4.6 PlayerCount is invalid)" );
 		m_Valid = false;
 		return;
-	}
+	}*/
 
 	READB( ISS, &m_MapGameType, 4 );		// GameType (4.7)
 	READB( ISS, &Garbage4, 4 );				// LanguageID (4.8)
@@ -381,14 +381,14 @@ void CReplay :: ParseReplay( bool parseBlocks )
 		return;
 	}
 
-	if( NumSlots == 0 || NumSlots > 12 )
+	/*if( NumSlots == 0 || NumSlots > 24 )
 	{
 		CONSOLE_Print( "[REPLAY] invalid replay (4.10 NumSlots is invalid)" );
 		m_Valid = false;
 		return;
-	}
+	}*/
 
-        for( int i = 0; i < NumSlots; ++i )
+    for( int i = 0; i < NumSlots; ++i )
 	{
 		unsigned char SlotData[9];
 		READB( ISS, SlotData, 9 );

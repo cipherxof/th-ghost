@@ -27,7 +27,7 @@
 #define GHOST_H
 
 #include "includes.h"
-
+	
 //
 // CGHost
 //
@@ -42,6 +42,7 @@ class CSHA1;
 class CBNET;
 class CBaseGame;
 class CGHostDB;
+class CGHostW3HMC;
 class CBaseCallable;
 class CLanguage;
 class CMap;
@@ -79,6 +80,7 @@ public:
 	vector<CBaseGame *> m_Games;			// these games are in progress
 	boost::mutex m_GamesMutex;
 	CGHostDB *m_DB;							// database
+	CGHostW3HMC *m_W3HMC;							
 	vector<CBaseCallable *> m_Callables;	// vector of orphaned callables waiting to die
 	boost::mutex m_CallablesMutex;
 	vector<BYTEARRAY> m_LocalAddresses;		// vector of local IP addresses
@@ -195,6 +197,8 @@ public:
 
 	deque<HostNameInfo> m_HostNameCache;	// host name lookup cache
 	boost::mutex m_HostNameCacheMutex;
+
+	uint32_t m_MaxPlayers;
 
 	CGHost( CConfig *CFG );
 	~CGHost( );
