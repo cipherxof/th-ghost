@@ -1,0 +1,542 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		225530DB1056BC7900FA646A /* huff.h in Headers */ = {isa = PBXBuildFile; fileRef = 32ED009D0D03542A00AB0B4E /* huff.h */; };
+		225530DC1056BC7900FA646A /* crc32.h in Headers */ = {isa = PBXBuildFile; fileRef = 32ED00A10D03542A00AB0B4E /* crc32.h */; };
+		225530DD1056BC7900FA646A /* md5.h in Headers */ = {isa = PBXBuildFile; fileRef = 32ED00A30D03542A00AB0B4E /* md5.h */; };
+		225530DE1056BC7900FA646A /* pklib.h in Headers */ = {isa = PBXBuildFile; fileRef = 32ED00A80D03542A00AB0B4E /* pklib.h */; };
+		225530DF1056BC7900FA646A /* SCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 32ED00AB0D03542A00AB0B4E /* SCommon.h */; };
+		225530E01056BC7900FA646A /* StormLib.h in Headers */ = {isa = PBXBuildFile; fileRef = 32ED00B60D03542A00AB0B4E /* StormLib.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		225530E11056BC7900FA646A /* StormPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 32ED00B70D03542A00AB0B4E /* StormPort.h */; settings = {ATTRIBUTES = (); }; };
+		225530E21056BC7900FA646A /* wave.h in Headers */ = {isa = PBXBuildFile; fileRef = 32ED00BC0D03542A00AB0B4E /* wave.h */; };
+		225530E31056BC8700FA646A /* huff.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED009C0D03542A00AB0B4E /* huff.cpp */; };
+		225530E41056BC8700FA646A /* crc32.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00A00D03542A00AB0B4E /* crc32.cpp */; };
+		225530E51056BC8700FA646A /* md5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00A20D03542A00AB0B4E /* md5.cpp */; };
+		225530E61056BC8700FA646A /* explode.c in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00A60D03542A00AB0B4E /* explode.c */; };
+		225530E71056BC8700FA646A /* implode.c in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00A70D03542A00AB0B4E /* implode.c */; };
+		225530E81056BC8700FA646A /* SAttrFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00A90D03542A00AB0B4E /* SAttrFile.cpp */; };
+		225530E91056BC8700FA646A /* SCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00AA0D03542A00AB0B4E /* SCommon.cpp */; };
+		225530EA1056BC8700FA646A /* SCompression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00AC0D03542A00AB0B4E /* SCompression.cpp */; };
+		225530EB1056BC8700FA646A /* SFileCompactArchive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00AD0D03542A00AB0B4E /* SFileCompactArchive.cpp */; };
+		225530EC1056BC8700FA646A /* SFileCreateArchiveEx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00AE0D03542A00AB0B4E /* SFileCreateArchiveEx.cpp */; };
+		225530ED1056BC8700FA646A /* SFileExtractFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00AF0D03542A00AB0B4E /* SFileExtractFile.cpp */; };
+		225530EE1056BC8700FA646A /* SFileFindFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00B00D03542A00AB0B4E /* SFileFindFile.cpp */; };
+		225530EF1056BC8700FA646A /* SFileOpenArchive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00B10D03542A00AB0B4E /* SFileOpenArchive.cpp */; };
+		225530F01056BC8700FA646A /* SFileOpenFileEx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00B20D03542A00AB0B4E /* SFileOpenFileEx.cpp */; };
+		225530F11056BC8700FA646A /* SFileReadFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00B30D03542A00AB0B4E /* SFileReadFile.cpp */; };
+		225530F21056BC8700FA646A /* SListFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00B40D03542A00AB0B4E /* SListFile.cpp */; };
+		225530F31056BC8700FA646A /* StormPortMac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00B90D03542A00AB0B4E /* StormPortMac.cpp */; };
+		225530F41056BC8700FA646A /* wave.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00BB0D03542A00AB0B4E /* wave.cpp */; };
+		225530F51056BC8E00FA646A /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 32D20A8A0CF3902D00230E7A /* libbz2.dylib */; settings = {ATTRIBUTES = (Required, ); }; };
+		225530F61056BC8E00FA646A /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 32D20A8B0CF3902D00230E7A /* libz.dylib */; };
+		225FAC9C0E53BAA100DA2CAE /* huff.h in Headers */ = {isa = PBXBuildFile; fileRef = 32ED009D0D03542A00AB0B4E /* huff.h */; };
+		225FAC9D0E53BAA100DA2CAE /* crc32.h in Headers */ = {isa = PBXBuildFile; fileRef = 32ED00A10D03542A00AB0B4E /* crc32.h */; };
+		225FAC9E0E53BAA100DA2CAE /* md5.h in Headers */ = {isa = PBXBuildFile; fileRef = 32ED00A30D03542A00AB0B4E /* md5.h */; settings = {ATTRIBUTES = (); }; };
+		225FAC9F0E53BAA100DA2CAE /* pklib.h in Headers */ = {isa = PBXBuildFile; fileRef = 32ED00A80D03542A00AB0B4E /* pklib.h */; };
+		225FACA00E53BAA100DA2CAE /* SCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 32ED00AB0D03542A00AB0B4E /* SCommon.h */; };
+		225FACA10E53BAA100DA2CAE /* StormLib.h in Headers */ = {isa = PBXBuildFile; fileRef = 32ED00B60D03542A00AB0B4E /* StormLib.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		225FACA20E53BAA100DA2CAE /* StormPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 32ED00B70D03542A00AB0B4E /* StormPort.h */; settings = {ATTRIBUTES = (); }; };
+		225FACA30E53BAA100DA2CAE /* wave.h in Headers */ = {isa = PBXBuildFile; fileRef = 32ED00BC0D03542A00AB0B4E /* wave.h */; };
+		225FACA50E53BAB400DA2CAE /* huff.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED009C0D03542A00AB0B4E /* huff.cpp */; };
+		225FACA60E53BAB400DA2CAE /* crc32.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00A00D03542A00AB0B4E /* crc32.cpp */; };
+		225FACA70E53BAB400DA2CAE /* md5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00A20D03542A00AB0B4E /* md5.cpp */; };
+		225FACA90E53BAB400DA2CAE /* explode.c in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00A60D03542A00AB0B4E /* explode.c */; };
+		225FACAA0E53BAB400DA2CAE /* implode.c in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00A70D03542A00AB0B4E /* implode.c */; };
+		225FACAB0E53BAB400DA2CAE /* SAttrFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00A90D03542A00AB0B4E /* SAttrFile.cpp */; };
+		225FACAC0E53BAB400DA2CAE /* SCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00AA0D03542A00AB0B4E /* SCommon.cpp */; };
+		225FACAD0E53BAB400DA2CAE /* SCompression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00AC0D03542A00AB0B4E /* SCompression.cpp */; };
+		225FACAE0E53BAB400DA2CAE /* SFileCompactArchive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00AD0D03542A00AB0B4E /* SFileCompactArchive.cpp */; };
+		225FACAF0E53BAB400DA2CAE /* SFileCreateArchiveEx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00AE0D03542A00AB0B4E /* SFileCreateArchiveEx.cpp */; };
+		225FACB00E53BAB400DA2CAE /* SFileExtractFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00AF0D03542A00AB0B4E /* SFileExtractFile.cpp */; };
+		225FACB10E53BAB400DA2CAE /* SFileFindFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00B00D03542A00AB0B4E /* SFileFindFile.cpp */; };
+		225FACB20E53BAB400DA2CAE /* SFileOpenArchive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00B10D03542A00AB0B4E /* SFileOpenArchive.cpp */; };
+		225FACB30E53BAB400DA2CAE /* SFileOpenFileEx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00B20D03542A00AB0B4E /* SFileOpenFileEx.cpp */; };
+		225FACB40E53BAB400DA2CAE /* SFileReadFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00B30D03542A00AB0B4E /* SFileReadFile.cpp */; };
+		225FACB50E53BAB400DA2CAE /* SListFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00B40D03542A00AB0B4E /* SListFile.cpp */; };
+		225FACB60E53BAB400DA2CAE /* StormPortMac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00B90D03542A00AB0B4E /* StormPortMac.cpp */; };
+		225FACB70E53BAB400DA2CAE /* wave.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32ED00BB0D03542A00AB0B4E /* wave.cpp */; };
+		225FADD40E53C06600DA2CAE /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 32D20A8A0CF3902D00230E7A /* libbz2.dylib */; settings = {ATTRIBUTES = (Required, ); }; };
+		225FADD50E53C06600DA2CAE /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 32D20A8B0CF3902D00230E7A /* libz.dylib */; settings = {ATTRIBUTES = (Required, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		2253A19F10568A83001909F9 /* StormLib.exp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.exports; name = StormLib.exp; path = stormlibdll/StormLib.exp; sourceTree = "<group>"; };
+		225530D41056BAC800FA646A /* libStormLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libStormLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		225FAC940E53B7F800DA2CAE /* StormLib.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StormLib.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		225FAC950E53B7F800DA2CAE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		32D20A8A0CF3902D00230E7A /* libbz2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbz2.dylib; path = /usr/lib/libbz2.dylib; sourceTree = "<absolute>"; };
+		32D20A8B0CF3902D00230E7A /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
+		32ED009C0D03542A00AB0B4E /* huff.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = huff.cpp; sourceTree = "<group>"; };
+		32ED009D0D03542A00AB0B4E /* huff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = huff.h; sourceTree = "<group>"; };
+		32ED00A00D03542A00AB0B4E /* crc32.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crc32.cpp; sourceTree = "<group>"; };
+		32ED00A10D03542A00AB0B4E /* crc32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crc32.h; sourceTree = "<group>"; };
+		32ED00A20D03542A00AB0B4E /* md5.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = md5.cpp; sourceTree = "<group>"; };
+		32ED00A30D03542A00AB0B4E /* md5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = md5.h; sourceTree = "<group>"; };
+		32ED00A60D03542A00AB0B4E /* explode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = explode.c; sourceTree = "<group>"; };
+		32ED00A70D03542A00AB0B4E /* implode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = implode.c; sourceTree = "<group>"; };
+		32ED00A80D03542A00AB0B4E /* pklib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pklib.h; sourceTree = "<group>"; };
+		32ED00A90D03542A00AB0B4E /* SAttrFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SAttrFile.cpp; path = stormlib/SAttrFile.cpp; sourceTree = "<group>"; };
+		32ED00AA0D03542A00AB0B4E /* SCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SCommon.cpp; path = stormlib/SCommon.cpp; sourceTree = "<group>"; };
+		32ED00AB0D03542A00AB0B4E /* SCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SCommon.h; path = stormlib/SCommon.h; sourceTree = "<group>"; };
+		32ED00AC0D03542A00AB0B4E /* SCompression.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SCompression.cpp; path = stormlib/SCompression.cpp; sourceTree = "<group>"; };
+		32ED00AD0D03542A00AB0B4E /* SFileCompactArchive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SFileCompactArchive.cpp; path = stormlib/SFileCompactArchive.cpp; sourceTree = "<group>"; };
+		32ED00AE0D03542A00AB0B4E /* SFileCreateArchiveEx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SFileCreateArchiveEx.cpp; path = stormlib/SFileCreateArchiveEx.cpp; sourceTree = "<group>"; };
+		32ED00AF0D03542A00AB0B4E /* SFileExtractFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SFileExtractFile.cpp; path = stormlib/SFileExtractFile.cpp; sourceTree = "<group>"; };
+		32ED00B00D03542A00AB0B4E /* SFileFindFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SFileFindFile.cpp; path = stormlib/SFileFindFile.cpp; sourceTree = "<group>"; };
+		32ED00B10D03542A00AB0B4E /* SFileOpenArchive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SFileOpenArchive.cpp; path = stormlib/SFileOpenArchive.cpp; sourceTree = "<group>"; };
+		32ED00B20D03542A00AB0B4E /* SFileOpenFileEx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SFileOpenFileEx.cpp; path = stormlib/SFileOpenFileEx.cpp; sourceTree = "<group>"; };
+		32ED00B30D03542A00AB0B4E /* SFileReadFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SFileReadFile.cpp; path = stormlib/SFileReadFile.cpp; sourceTree = "<group>"; };
+		32ED00B40D03542A00AB0B4E /* SListFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SListFile.cpp; path = stormlib/SListFile.cpp; sourceTree = "<group>"; };
+		32ED00B60D03542A00AB0B4E /* StormLib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StormLib.h; path = stormlib/StormLib.h; sourceTree = "<group>"; };
+		32ED00B70D03542A00AB0B4E /* StormPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StormPort.h; path = stormlib/StormPort.h; sourceTree = "<group>"; };
+		32ED00B90D03542A00AB0B4E /* StormPortMac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = StormPortMac.cpp; path = stormlib/StormPortMac.cpp; sourceTree = "<group>"; };
+		32ED00BB0D03542A00AB0B4E /* wave.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wave.cpp; sourceTree = "<group>"; };
+		32ED00BC0D03542A00AB0B4E /* wave.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wave.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		225530D21056BAC800FA646A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				225530F51056BC8E00FA646A /* libbz2.dylib in Frameworks */,
+				225530F61056BC8E00FA646A /* libz.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		225FAC920E53B7F800DA2CAE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				225FADD40E53C06600DA2CAE /* libbz2.dylib in Frameworks */,
+				225FADD50E53C06600DA2CAE /* libz.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		034768DDFF38A45A11DB9C8B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				225FAC940E53B7F800DA2CAE /* StormLib.framework */,
+				225530D41056BAC800FA646A /* libStormLib.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0867D691FE84028FC02AAC07 /* stormlib */ = {
+			isa = PBXGroup;
+			children = (
+				32DBEE830D00E58F00DB1E81 /* Source */,
+				0867D69AFE84028FC02AAC07 /* External Frameworks and Libraries */,
+				22B54B321054B287001D6436 /* Resources */,
+				034768DDFF38A45A11DB9C8B /* Products */,
+				2253A19F10568A83001909F9 /* StormLib.exp */,
+			);
+			name = stormlib;
+			sourceTree = "<group>";
+		};
+		0867D69AFE84028FC02AAC07 /* External Frameworks and Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				32D20A8A0CF3902D00230E7A /* libbz2.dylib */,
+				32D20A8B0CF3902D00230E7A /* libz.dylib */,
+			);
+			name = "External Frameworks and Libraries";
+			sourceTree = "<group>";
+		};
+		22B54B321054B287001D6436 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				225FAC950E53B7F800DA2CAE /* Info.plist */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		32DBEE830D00E58F00DB1E81 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				32ED009B0D03542A00AB0B4E /* huffman */,
+				32ED009F0D03542A00AB0B4E /* misc */,
+				32ED00A40D03542A00AB0B4E /* pklib */,
+				32ED00A90D03542A00AB0B4E /* SAttrFile.cpp */,
+				32ED00AA0D03542A00AB0B4E /* SCommon.cpp */,
+				32ED00AB0D03542A00AB0B4E /* SCommon.h */,
+				32ED00AC0D03542A00AB0B4E /* SCompression.cpp */,
+				32ED00AD0D03542A00AB0B4E /* SFileCompactArchive.cpp */,
+				32ED00AE0D03542A00AB0B4E /* SFileCreateArchiveEx.cpp */,
+				32ED00AF0D03542A00AB0B4E /* SFileExtractFile.cpp */,
+				32ED00B00D03542A00AB0B4E /* SFileFindFile.cpp */,
+				32ED00B10D03542A00AB0B4E /* SFileOpenArchive.cpp */,
+				32ED00B20D03542A00AB0B4E /* SFileOpenFileEx.cpp */,
+				32ED00B30D03542A00AB0B4E /* SFileReadFile.cpp */,
+				32ED00B40D03542A00AB0B4E /* SListFile.cpp */,
+				32ED00B60D03542A00AB0B4E /* StormLib.h */,
+				32ED00B70D03542A00AB0B4E /* StormPort.h */,
+				32ED00B90D03542A00AB0B4E /* StormPortMac.cpp */,
+				32ED00BA0D03542A00AB0B4E /* wave */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		32ED009B0D03542A00AB0B4E /* huffman */ = {
+			isa = PBXGroup;
+			children = (
+				32ED009C0D03542A00AB0B4E /* huff.cpp */,
+				32ED009D0D03542A00AB0B4E /* huff.h */,
+			);
+			name = huffman;
+			path = stormlib/huffman;
+			sourceTree = "<group>";
+		};
+		32ED009F0D03542A00AB0B4E /* misc */ = {
+			isa = PBXGroup;
+			children = (
+				32ED00A00D03542A00AB0B4E /* crc32.cpp */,
+				32ED00A10D03542A00AB0B4E /* crc32.h */,
+				32ED00A20D03542A00AB0B4E /* md5.cpp */,
+				32ED00A30D03542A00AB0B4E /* md5.h */,
+			);
+			name = misc;
+			path = stormlib/misc;
+			sourceTree = "<group>";
+		};
+		32ED00A40D03542A00AB0B4E /* pklib */ = {
+			isa = PBXGroup;
+			children = (
+				32ED00A60D03542A00AB0B4E /* explode.c */,
+				32ED00A70D03542A00AB0B4E /* implode.c */,
+				32ED00A80D03542A00AB0B4E /* pklib.h */,
+			);
+			name = pklib;
+			path = stormlib/pklib;
+			sourceTree = "<group>";
+		};
+		32ED00BA0D03542A00AB0B4E /* wave */ = {
+			isa = PBXGroup;
+			children = (
+				32ED00BB0D03542A00AB0B4E /* wave.cpp */,
+				32ED00BC0D03542A00AB0B4E /* wave.h */,
+			);
+			name = wave;
+			path = stormlib/wave;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		225530D01056BAC800FA646A /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				225530DB1056BC7900FA646A /* huff.h in Headers */,
+				225530DC1056BC7900FA646A /* crc32.h in Headers */,
+				225530DD1056BC7900FA646A /* md5.h in Headers */,
+				225530DE1056BC7900FA646A /* pklib.h in Headers */,
+				225530DF1056BC7900FA646A /* SCommon.h in Headers */,
+				225530E01056BC7900FA646A /* StormLib.h in Headers */,
+				225530E11056BC7900FA646A /* StormPort.h in Headers */,
+				225530E21056BC7900FA646A /* wave.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		225FAC8F0E53B7F800DA2CAE /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				225FAC9C0E53BAA100DA2CAE /* huff.h in Headers */,
+				225FAC9D0E53BAA100DA2CAE /* crc32.h in Headers */,
+				225FAC9E0E53BAA100DA2CAE /* md5.h in Headers */,
+				225FAC9F0E53BAA100DA2CAE /* pklib.h in Headers */,
+				225FACA00E53BAA100DA2CAE /* SCommon.h in Headers */,
+				225FACA10E53BAA100DA2CAE /* StormLib.h in Headers */,
+				225FACA20E53BAA100DA2CAE /* StormPort.h in Headers */,
+				225FACA30E53BAA100DA2CAE /* wave.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		225530D31056BAC800FA646A /* StormLib */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 225530D71056BB1600FA646A /* Build configuration list for PBXNativeTarget "StormLib" */;
+			buildPhases = (
+				225530D01056BAC800FA646A /* Headers */,
+				225530D11056BAC800FA646A /* Sources */,
+				225530D21056BAC800FA646A /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = StormLib;
+			productName = StormLibd;
+			productReference = 225530D41056BAC800FA646A /* libStormLib.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		225FAC930E53B7F800DA2CAE /* StormLibFramework */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 225FAC980E53B7F900DA2CAE /* Build configuration list for PBXNativeTarget "StormLibFramework" */;
+			buildPhases = (
+				225FAC8F0E53B7F800DA2CAE /* Headers */,
+				225FAC900E53B7F800DA2CAE /* Resources */,
+				225FAC910E53B7F800DA2CAE /* Sources */,
+				225FAC920E53B7F800DA2CAE /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = StormLibFramework;
+			productName = StormLib;
+			productReference = 225FAC940E53B7F800DA2CAE /* StormLib.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0867D690FE84028FC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB916408733D950010E9CD /* Build configuration list for PBXProject "StormLib" */;
+			compatibilityVersion = "Xcode 2.4";
+			hasScannedForEncodings = 1;
+			mainGroup = 0867D691FE84028FC02AAC07 /* stormlib */;
+			productRefGroup = 034768DDFF38A45A11DB9C8B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				225FAC930E53B7F800DA2CAE /* StormLibFramework */,
+				225530D31056BAC800FA646A /* StormLib */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		225FAC900E53B7F800DA2CAE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		225530D11056BAC800FA646A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				225530E31056BC8700FA646A /* huff.cpp in Sources */,
+				225530E41056BC8700FA646A /* crc32.cpp in Sources */,
+				225530E51056BC8700FA646A /* md5.cpp in Sources */,
+				225530E61056BC8700FA646A /* explode.c in Sources */,
+				225530E71056BC8700FA646A /* implode.c in Sources */,
+				225530E81056BC8700FA646A /* SAttrFile.cpp in Sources */,
+				225530E91056BC8700FA646A /* SCommon.cpp in Sources */,
+				225530EA1056BC8700FA646A /* SCompression.cpp in Sources */,
+				225530EB1056BC8700FA646A /* SFileCompactArchive.cpp in Sources */,
+				225530EC1056BC8700FA646A /* SFileCreateArchiveEx.cpp in Sources */,
+				225530ED1056BC8700FA646A /* SFileExtractFile.cpp in Sources */,
+				225530EE1056BC8700FA646A /* SFileFindFile.cpp in Sources */,
+				225530EF1056BC8700FA646A /* SFileOpenArchive.cpp in Sources */,
+				225530F01056BC8700FA646A /* SFileOpenFileEx.cpp in Sources */,
+				225530F11056BC8700FA646A /* SFileReadFile.cpp in Sources */,
+				225530F21056BC8700FA646A /* SListFile.cpp in Sources */,
+				225530F31056BC8700FA646A /* StormPortMac.cpp in Sources */,
+				225530F41056BC8700FA646A /* wave.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		225FAC910E53B7F800DA2CAE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				225FACA50E53BAB400DA2CAE /* huff.cpp in Sources */,
+				225FACA60E53BAB400DA2CAE /* crc32.cpp in Sources */,
+				225FACA70E53BAB400DA2CAE /* md5.cpp in Sources */,
+				225FACA90E53BAB400DA2CAE /* explode.c in Sources */,
+				225FACAA0E53BAB400DA2CAE /* implode.c in Sources */,
+				225FACAB0E53BAB400DA2CAE /* SAttrFile.cpp in Sources */,
+				225FACAC0E53BAB400DA2CAE /* SCommon.cpp in Sources */,
+				225FACAD0E53BAB400DA2CAE /* SCompression.cpp in Sources */,
+				225FACAE0E53BAB400DA2CAE /* SFileCompactArchive.cpp in Sources */,
+				225FACAF0E53BAB400DA2CAE /* SFileCreateArchiveEx.cpp in Sources */,
+				225FACB00E53BAB400DA2CAE /* SFileExtractFile.cpp in Sources */,
+				225FACB10E53BAB400DA2CAE /* SFileFindFile.cpp in Sources */,
+				225FACB20E53BAB400DA2CAE /* SFileOpenArchive.cpp in Sources */,
+				225FACB30E53BAB400DA2CAE /* SFileOpenFileEx.cpp in Sources */,
+				225FACB40E53BAB400DA2CAE /* SFileReadFile.cpp in Sources */,
+				225FACB50E53BAB400DA2CAE /* SListFile.cpp in Sources */,
+				225FACB60E53BAB400DA2CAE /* StormPortMac.cpp in Sources */,
+				225FACB70E53BAB400DA2CAE /* wave.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB916508733D950010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (
+					i386,
+					ppc,
+					x86_64,
+					ppc64,
+				);
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_VERSION = 4.0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Carbon,
+				);
+				PREBINDING = NO;
+				SDKROOT_i386 = macosx10.4;
+				SDKROOT_ppc = macosx10.4;
+				SDKROOT_ppc64 = macosx10.5;
+				SDKROOT_x86_64 = macosx10.5;
+				SKIP_INSTALL = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
+			};
+			name = Debug;
+		};
+		1DEB916608733D950010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (
+					i386,
+					ppc,
+					x86_64,
+					ppc64,
+				);
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_VERSION = 4.0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Carbon,
+				);
+				PREBINDING = NO;
+				SDKROOT_i386 = macosx10.4;
+				SDKROOT_ppc = macosx10.4;
+				SDKROOT_ppc64 = macosx10.5;
+				SDKROOT_x86_64 = macosx10.5;
+				SKIP_INSTALL = YES;
+				STRIP_INSTALLED_PRODUCT = YES;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		225530D51056BAC900FA646A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = StormLib;
+			};
+			name = Debug;
+		};
+		225530D61056BAC900FA646A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = StormLib;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		225FAC960E53B7F900DA2CAE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXPORTED_SYMBOLS_FILE = "$(PROJECT_DIR)/stormlibdll/StormLib.exp";
+				FRAMEWORK_VERSION = A;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				PREBINDING = NO;
+				PRODUCT_NAME = StormLib;
+			};
+			name = Debug;
+		};
+		225FAC970E53B7F900DA2CAE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXPORTED_SYMBOLS_FILE = "$(PROJECT_DIR)/stormlibdll/StormLib.exp";
+				FRAMEWORK_VERSION = A;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				PREBINDING = NO;
+				PRODUCT_NAME = StormLib;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB916408733D950010E9CD /* Build configuration list for PBXProject "StormLib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB916508733D950010E9CD /* Debug */,
+				1DEB916608733D950010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		225530D71056BB1600FA646A /* Build configuration list for PBXNativeTarget "StormLib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				225530D51056BAC900FA646A /* Debug */,
+				225530D61056BAC900FA646A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		225FAC980E53B7F900DA2CAE /* Build configuration list for PBXNativeTarget "StormLibFramework" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				225FAC960E53B7F900DA2CAE /* Debug */,
+				225FAC970E53B7F900DA2CAE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0867D690FE84028FC02AAC07 /* Project object */;
+}

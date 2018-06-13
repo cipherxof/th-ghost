@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/2/trunk/StormLib/stormlib/zlib/contrib/dotzlib/DotZLib
+END
+AssemblyInfo.cs
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/2/trunk/StormLib/stormlib/zlib/contrib/dotzlib/DotZLib/AssemblyInfo.cs
+END
+CircularBuffer.cs
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/!svn/ver/2/trunk/StormLib/stormlib/zlib/contrib/dotzlib/DotZLib/CircularBuffer.cs
+END
+DotZLib.csproj
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/!svn/ver/2/trunk/StormLib/stormlib/zlib/contrib/dotzlib/DotZLib/DotZLib.csproj
+END
+UnitTests.cs
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/!svn/ver/2/trunk/StormLib/stormlib/zlib/contrib/dotzlib/DotZLib/UnitTests.cs
+END
+Inflater.cs
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/!svn/ver/2/trunk/StormLib/stormlib/zlib/contrib/dotzlib/DotZLib/Inflater.cs
+END
+ChecksumImpl.cs
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/2/trunk/StormLib/stormlib/zlib/contrib/dotzlib/DotZLib/ChecksumImpl.cs
+END
+GZipStream.cs
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/!svn/ver/2/trunk/StormLib/stormlib/zlib/contrib/dotzlib/DotZLib/GZipStream.cs
+END
+Deflater.cs
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/!svn/ver/2/trunk/StormLib/stormlib/zlib/contrib/dotzlib/DotZLib/Deflater.cs
+END
+DotZLib.cs
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/!svn/ver/2/trunk/StormLib/stormlib/zlib/contrib/dotzlib/DotZLib/DotZLib.cs
+END
+CodecBase.cs
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/!svn/ver/2/trunk/StormLib/stormlib/zlib/contrib/dotzlib/DotZLib/CodecBase.cs
+END
