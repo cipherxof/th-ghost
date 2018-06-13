@@ -1,20 +1,25 @@
 /*
 
-   Copyright [2008] [Trevor Hogan]
+	ent-ghost
+	Copyright [2011-2013] [Jack Lu]
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+	This file is part of the ent-ghost source code.
 
-       http://www.apache.org/licenses/LICENSE-2.0
+	ent-ghost is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+	ent-ghost source code is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details.
 
-   CODE PORTED FROM THE ORIGINAL GHOST PROJECT: http://ghost.pwner.org/
+	You should have received a copy of the GNU General Public License
+	along with ent-ghost source code. If not, see <http://www.gnu.org/licenses/>.
+
+	ent-ghost is modified from GHost++ (http://ghostplusplus.googlecode.com/)
+	GHost++ is Copyright [2008] [Trevor Hogan]
 
 */
 
@@ -94,7 +99,7 @@ public:
 	string SettingLatencyToMaximum( string max );
 	string SettingLatencyTo( string latency );
 	string KickingPlayersWithPingsGreaterThan( string total, string ping );
-	string HasPlayedGamesWithThisBot( string user, string firstgame, string lastgame, string totalgames, string avgloadingtime, string avgstay );
+	string HasPlayedGamesWithThisBot( string user, string totalgames, string avgstay, string playtime );
 	string HasntPlayedGamesWithThisBot( string user );
 	string AutokickingPlayerForExcessivePing( string victim, string ping );
 	string SpoofCheckAcceptedFor( string server, string user );
@@ -107,8 +112,12 @@ public:
 	string ShortestLoadByPlayer( string user, string loadingtime );
 	string LongestLoadByPlayer( string user, string loadingtime );
 	string YourLoadingTimeWas( string loadingtime );
-	string HasPlayedDotAGamesWithThisBot( string user, string totalgames, string totalwins, string totallosses, string totalkills, string totaldeaths, string totalcreepkills, string totalcreepdenies, string totalassists, string totalneutralkills, string totaltowerkills, string totalraxkills, string totalcourierkills, string avgkills, string avgdeaths, string avgcreepkills, string avgcreepdenies, string avgassists, string avgneutralkills, string avgtowerkills, string avgraxkills, string avgcourierkills );
-	string HasntPlayedDotAGamesWithThisBot( string user );
+	string HasPlayedDotAGamesWithThisBot( string user, string totalgames, string totalwins, string totallosses, string totalkills, string totaldeaths, string totalcreepkills, string totalcreepdenies, string totalassists, string totalneutralkills, string totaltowerkills, string totalraxkills, string totalcourierkills, string avgkills, string avgdeaths, string avgcreepkills, string avgcreepdenies, string avgassists, string avgneutralkills, string avgtowerkills, string avgraxkills, string avgcourierkills, string score, string category );
+	string HasPlayedVampGamesWithThisBot( string user, string totalgames, string humangames, string vampgames, string humanwins, string vampwins, string humanlosses, string vamplosses, string vampkills, string mincc, string avgcc, string minbase, string avgbase );
+	string HasPlayedTreeGamesWithThisBot( string user, string totalgames, string totalwins, string totallosses, string totalkills, string totaltks, string totaldeaths, string totalsaves, string avgkills, string avgtks, string avgdeaths, string avgsaves, string totalentgames, string totalinfernalgames );
+	string HasntPlayedDotAGamesWithThisBot( string user, string category );
+	string HasntPlayedVampGamesWithThisBot( string user );
+	string HasntPlayedTreeGamesWithThisBot( string user );
 	string WasKickedForReservedPlayer( string reserved );
 	string WasKickedForOwnerPlayer( string owner );
 	string WasKickedByPlayer( string user );
@@ -254,6 +263,12 @@ public:
 	string WaitForReconnectSecondsRemain( string seconds );
 	string WasUnrecoverablyDroppedFromGProxy( );
 	string PlayerReconnectedWithGProxy( string name );
+	string CantKickPlayers( );
+	string UnableToCreateGameInvalidCharacters( string gamename );
+	string TeamForfeited( string team );
+	string ForfeitStatsWarning( );
+	string ForfeitVote( string user );
+	string ForfeitVotesNeeded( string votes, string total, string team );
 };
 
 #endif

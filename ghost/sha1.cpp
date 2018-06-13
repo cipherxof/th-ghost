@@ -126,7 +126,7 @@ void CSHA1::Final()
 	uint32_t i = 0, j = 0;
 	unsigned char finalcount[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
-	for (i = 0; i < 8; i++)
+        for (i = 0; i < 8; ++i)
 		finalcount[i] = (unsigned char)((m_count[(i >= 4 ? 0 : 1)]
 			>> ((3 - (i & 3)) * 8) ) & 255); // Endian independent
 
@@ -137,7 +137,7 @@ void CSHA1::Final()
 
 	Update(finalcount, 8); // Cause a SHA1Transform()
 
-	for (i = 0; i < 20; i++)
+        for (i = 0; i < 20; ++i)
 	{
 		m_digest[i] = (unsigned char)((m_state[i >> 2] >> ((3 - (i & 3)) * 8) ) & 255);
 	}
@@ -165,7 +165,7 @@ void CSHA1::ReportHash(char *szReport, unsigned char uReportType)
 		sprintf(szTemp, "%02x", m_digest[0]);
 		strcat(szReport, szTemp);
 
-		for(i = 1; i < 20; i++)
+		for(i = 1; i < 20; ++i)
 		{
 			sprintf(szTemp, "%02x", m_digest[i]);
 			strcat(szReport, szTemp);
@@ -176,7 +176,7 @@ void CSHA1::ReportHash(char *szReport, unsigned char uReportType)
 		sprintf(szTemp, "%u", m_digest[0]);
 		strcat(szReport, szTemp);
 
-		for(i = 1; i < 20; i++)
+		for(i = 1; i < 20; ++i)
 		{
 			sprintf(szTemp, " %u", m_digest[i]);
 			strcat(szReport, szTemp);

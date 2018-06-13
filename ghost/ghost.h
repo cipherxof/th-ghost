@@ -1,20 +1,25 @@
 /*
 
-   Copyright [2008] [Trevor Hogan]
+	ent-ghost
+	Copyright [2011-2013] [Jack Lu]
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+	This file is part of the ent-ghost source code.
 
-       http://www.apache.org/licenses/LICENSE-2.0
+	ent-ghost is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+	ent-ghost source code is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details.
 
-   CODE PORTED FROM THE ORIGINAL GHOST PROJECT: http://ghost.pwner.org/
+	You should have received a copy of the GNU General Public License
+	along with ent-ghost source code. If not, see <http://www.gnu.org/licenses/>.
+
+	ent-ghost is modified from GHost++ (http://ghostplusplus.googlecode.com/)
+	GHost++ is Copyright [2008] [Trevor Hogan]
 
 */
 
@@ -31,40 +36,60 @@ class CUDPSocket;
 class CTCPServer;
 class CTCPSocket;
 class CGPSProtocol;
+class CGCBIProtocol;
 class CCRC32;
 class CSHA1;
 class CBNET;
 class CBaseGame;
-class CAdminGame;
 class CGHostDB;
 class CBaseCallable;
 class CLanguage;
 class CMap;
 class CSaveGame;
 class CConfig;
+class CCallableCommandList;
+class CCallableSpoofList;
+struct DenyInfo;
+struct HostNameInfo;
+
+struct GProxyReconnector {
+	CTCPSocket *socket;
+	unsigned char PID;
+	uint32_t ReconnectKey;
+	uint32_t LastPacket;
+	uint32_t PostedTime;
+};
 
 class CGHost
 {
 public:
 	CUDPSocket *m_UDPSocket;				// a UDP socket for sending broadcasts and other junk (used with !sendlan)
+	CUDPSocket *m_GamelistSocket;				// a UDP socket for sending broadcasts and other junk (used with !sendlan)
+	CUDPSocket *m_LocalSocket;				// a UDP socket for sending broadcasts and other junk (used with !sendlan)
 	CTCPServer *m_ReconnectSocket;			// listening socket for GProxy++ reliable reconnects
 	vector<CTCPSocket *> m_ReconnectSockets;// vector of sockets attempting to reconnect (connected but not identified yet)
+	vector<string> m_SlapPhrases;		   // vector of phrases
 	CGPSProtocol *m_GPSProtocol;
+	CGCBIProtocol *m_GCBIProtocol;
 	CCRC32 *m_CRC;							// for calculating CRC's
 	CSHA1 *m_SHA;							// for calculating SHA1's
 	vector<CBNET *> m_BNETs;				// all our battle.net connections (there can be more than one)
+	string m_UserName;						// first username seen in battle.net connection, to identify this bot
 	CBaseGame *m_CurrentGame;				// this game is still in the lobby state
-	CAdminGame *m_AdminGame;				// this "fake game" allows an admin who knows the password to control the bot from the local network
 	vector<CBaseGame *> m_Games;			// these games are in progress
+	boost::mutex m_GamesMutex;
 	CGHostDB *m_DB;							// database
-	CGHostDB *m_DBLocal;					// local database (for temporary data)
 	vector<CBaseCallable *> m_Callables;	// vector of orphaned callables waiting to die
+	boost::mutex m_CallablesMutex;
 	vector<BYTEARRAY> m_LocalAddresses;		// vector of local IP addresses
+	map<string, DenyInfo> m_DenyIP;			// map (IP -> DenyInfo) of denied IP addresses
+	boost::mutex m_DenyMutex;
 	CLanguage *m_Language;					// language
 	CMap *m_Map;							// the currently loaded map
 	CMap *m_AdminMap;						// the map to use in the admin game
 	CMap *m_AutoHostMap;					// the map to use when autohosting
 	CSaveGame *m_SaveGame;					// the save game to use
+	GeoIP *m_GeoIP;							// GeoIP object
 	vector<PIDPlayer> m_EnforcePlayers;		// vector of pids to force players to use in the next game (used with saved games)
 	bool m_Exiting;							// set to true to force ghost to shutdown next update (used by SignalCatcher)
 	bool m_ExitingNice;						// set to true to force ghost to disconnect from all battle.net connections and wait for all games to finish before shutting down
@@ -77,6 +102,8 @@ public:
 	uint32_t m_AutoHostMaximumGames;		// maximum number of games to auto host
 	uint32_t m_AutoHostAutoStartPlayers;	// when using auto hosting auto start the game when this many players have joined
 	uint32_t m_LastAutoHostTime;			// GetTime when the last auto host was attempted
+	uint32_t m_LastCommandListTime;			// GetTime when last refreshed command list
+	CCallableCommandList *m_CallableCommandList;			// threaded database command list in progress
 	bool m_AutoHostMatchMaking;
 	double m_AutoHostMinimumScore;
 	double m_AutoHostMaximumScore;
@@ -112,27 +139,62 @@ public:
 	uint32_t m_MaxDownloadSpeed;			// config value: maximum total map download speed in KB/sec
 	bool m_LCPings;							// config value: use LC style pings (divide actual pings by two)
 	uint32_t m_AutoKickPing;				// config value: auto kick players with ping higher than this
-	uint32_t m_BanMethod;					// config value: ban method (ban by name/ip/both)
 	string m_IPBlackListFile;				// config value: IP blacklist file (ipblacklist.txt)
 	uint32_t m_LobbyTimeLimit;				// config value: auto close the game lobby after this many minutes without any reserved players
 	uint32_t m_Latency;						// config value: the latency (by default)
 	uint32_t m_SyncLimit;					// config value: the maximum number of packets a player can fall out of sync before starting the lag screen (by default)
+	bool m_VoteStartAllowed;				// config value: if votestarts are allowed or not
+	bool m_VoteStartAutohostOnly;		   // config value: if votestarts are only allowed in autohosted games
+	uint32_t m_VoteStartMinPlayers;			 // config value: minimum number of players before users can !votestart
 	bool m_VoteKickAllowed;					// config value: if votekicks are allowed or not
 	uint32_t m_VoteKickPercentage;			// config value: percentage of players required to vote yes for a votekick to pass
 	string m_DefaultMap;					// config value: default map (map.cfg)
 	string m_MOTDFile;						// config value: motd.txt
 	string m_GameLoadedFile;				// config value: gameloaded.txt
 	string m_GameOverFile;					// config value: gameover.txt
+	string m_GeoIPFile;						// config value: geoip.dat file
 	bool m_LocalAdminMessages;				// config value: send local admin messages or not
-	bool m_AdminGameCreate;					// config value: create the admin game or not
-	uint16_t m_AdminGamePort;				// config value: the port to host the admin game on
-	string m_AdminGamePassword;				// config value: the admin game password
-	string m_AdminGameMap;					// config value: the admin game map config to use
 	unsigned char m_LANWar3Version;			// config value: LAN warcraft 3 version
 	uint32_t m_ReplayWar3Version;			// config value: replay warcraft 3 version (for saving replays)
 	uint32_t m_ReplayBuildNumber;			// config value: replay build number (for saving replays)
 	bool m_TCPNoDelay;						// config value: use Nagle's algorithm or not
 	uint32_t m_MatchMakingMethod;			// config value: the matchmaking method
+	vector<GProxyReconnector *> m_PendingReconnects;
+	boost::mutex m_ReconnectMutex;
+	uint32_t m_MapGameType;
+	bool m_Openstats;						// config value: whether we have openstats tables
+	uint32_t m_Autoban;						// config value: how long to autoban for (hours)
+	uint32_t m_AutobanFirstLeavers;			// config value: number of first leavers to autoban
+	uint32_t m_AutobanFirstLimit;			// config value: time limit on banning first leavers, from beginning of game (seconds)
+	uint32_t m_AutobanMinAllies;			// config value: if player has less than this many allies, don't autoban
+	uint32_t m_AutobanMinEnemies;			// config value: if player has less than this many enemies, don't autoban (seconds)
+	uint32_t m_AutobanGameLimit;			// config value: time limit measured backwards from end of game to autoban
+	uint32_t m_GameCounterLimit;			// config value: limit to the #XX autohosting
+	
+	uint32_t m_BanDuration;					// config value: default ban duration (hours)
+	uint32_t m_CBanDuration;				// config value: cban duration (hours)
+	uint32_t m_TBanDuration;				// config value: tban duration (hours)
+	uint32_t m_PBanDuration;				// config value: pban duration (hours)
+	uint32_t m_WBanDuration;				// config value: wban duration (hours)
+	
+	uint32_t m_AutoMuteSpammer;				// config value: auto mute spammers?
+	bool m_StatsOnJoin;						// config value: attempt to show stats on join?
+	bool m_AllowAnyConnect;					// config value: allow any wc3connect users to join? (don't check session)
+	
+    string m_LocalIPs;						// config value: list of local IP's (which Garena is allowed from)
+	vector<string> m_FlameTriggers;			// triggers for antiflame system
+	uint32_t m_LastDenyCleanTime;			// last time we cleaned the deny table
+	bool m_CloseSinglePlayer;				// whether to close games when there's only one player left
+	
+	boost::mutex m_SpoofMutex;
+	map<string, string> m_SpoofList; 		// donators can opt to spoof their name
+	uint32_t m_LastSpoofRefreshTime;		// refresh spoof list every 2 hours
+	CCallableSpoofList *m_CallableSpoofList; // spoof list refresh in progress
+
+	bool m_DisableBot;						// whether this bot is currently disabled
+
+	deque<HostNameInfo> m_HostNameCache;	// host name lookup cache
+	boost::mutex m_HostNameCacheMutex;
 
 	CGHost( CConfig *CFG );
 	~CGHost( );
@@ -160,8 +222,26 @@ public:
 	void ReloadConfigs( );
 	void SetConfigs( CConfig *CFG );
 	void ExtractScripts( );
-	void LoadIPToCountryData( );
 	void CreateGame( CMap *map, unsigned char gameState, bool saveGame, string gameName, string ownerName, string creatorName, string creatorServer, bool whisper );
+	
+	void DenyIP( string ip, uint32_t duration, string reason );
+	bool CheckDeny( string ip );
+	bool FlameCheck( string message );
+	string GetSpoofName( string name );
+	bool IsLocal( string ip );
+	string FromCheck( string ip );
+	string HostNameLookup( string ip );
+};
+
+struct DenyInfo {
+	uint32_t Time;
+	uint32_t Duration;
+	uint32_t Count;
+};
+
+struct HostNameInfo {
+	string ip;
+	string hostname;
 };
 
 #endif

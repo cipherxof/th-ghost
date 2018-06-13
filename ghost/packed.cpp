@@ -1,20 +1,25 @@
 /*
 
-   Copyright [2008] [Trevor Hogan]
+	ent-ghost
+	Copyright [2011-2013] [Jack Lu]
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+	This file is part of the ent-ghost source code.
 
-       http://www.apache.org/licenses/LICENSE-2.0
+	ent-ghost is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+	ent-ghost source code is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details.
 
-   CODE PORTED FROM THE ORIGINAL GHOST PROJECT: http://ghost.pwner.org/
+	You should have received a copy of the GNU General Public License
+	along with ent-ghost source code. If not, see <http://www.gnu.org/licenses/>.
+
+	ent-ghost is modified from GHost++ (http://ghostplusplus.googlecode.com/)
+	GHost++ is Copyright [2008] [Trevor Hogan]
 
 */
 
@@ -66,21 +71,10 @@ int tzuncompress( Bytef *dest, uLongf *destLen, const Bytef *source, uLong sourc
 // CPacked
 //
 
-CPacked :: CPacked( )
+CPacked :: CPacked( ) : m_Valid( true ), m_HeaderSize( 0 ), m_CompressedSize( 0 ), m_HeaderVersion( 0 ), m_DecompressedSize( 0 ), m_NumBlocks( 0 ), m_War3Identifier( 0 ), m_War3Version( 0 ), m_BuildNumber( 0 ), m_Flags( 0 ), m_ReplayLength( 0 )
 {
 	m_CRC = new CCRC32( );
 	m_CRC->Initialize( );
-	m_Valid = true;
-	m_HeaderSize = 0;
-	m_CompressedSize = 0;
-	m_HeaderVersion = 0;
-	m_DecompressedSize = 0;
-	m_NumBlocks = 0;
-	m_War3Identifier = 0;
-	m_War3Version = 0;
-	m_BuildNumber = 0;
-	m_Flags = 0;
-	m_ReplayLength = 0;
 }
 
 CPacked :: ~CPacked( )
@@ -196,7 +190,7 @@ void CPacked :: Decompress( bool allBlocks )
 
 	// read blocks
 
-	for( uint32_t i = 0; i < m_NumBlocks; i++ )
+        for( uint32_t i = 0; i < m_NumBlocks; ++i )
 	{
 		uint16_t BlockCompressed;
 		uint16_t BlockDecompressed;
@@ -374,14 +368,13 @@ void CPacked :: Compress( bool TFT )
 
 	// append blocks
 
-	for( vector<string> :: iterator i = CompressedBlocks.begin( ); i != CompressedBlocks.end( ); i++ )
+        for( vector<string> :: iterator i = CompressedBlocks.begin( ); i != CompressedBlocks.end( ); ++i )
 	{
 		BYTEARRAY BlockHeader;
 		UTIL_AppendByteArray( BlockHeader, (uint16_t)(*i).size( ), false );
 		UTIL_AppendByteArray( BlockHeader, (uint16_t)8192, false );
 
 		// append zero block header CRC
-
 		UTIL_AppendByteArray( BlockHeader, (uint32_t)0, false );
 
 		// calculate block header CRC

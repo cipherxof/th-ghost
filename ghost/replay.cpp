@@ -1,20 +1,25 @@
 /*
 
-   Copyright [2008] [Trevor Hogan]
+	ent-ghost
+	Copyright [2011-2013] [Jack Lu]
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+	This file is part of the ent-ghost source code.
 
-       http://www.apache.org/licenses/LICENSE-2.0
+	ent-ghost is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+	ent-ghost source code is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details.
 
-   CODE PORTED FROM THE ORIGINAL GHOST PROJECT: http://ghost.pwner.org/
+	You should have received a copy of the GNU General Public License
+	along with ent-ghost source code. If not, see <http://www.gnu.org/licenses/>.
+
+	ent-ghost is modified from GHost++ (http://ghostplusplus.googlecode.com/)
+	GHost++ is Copyright [2008] [Trevor Hogan]
 
 */
 
@@ -28,14 +33,8 @@
 // CReplay
 //
 
-CReplay :: CReplay( ) : CPacked( )
+CReplay :: CReplay( ) : CPacked( ), m_HostPID( 0 ), m_PlayerCount( 0 ), m_MapGameType( 0 ), m_RandomSeed( 0 ), m_SelectMode( 0 ), m_StartSpotCount( 0 )
 {
-	m_HostPID = 0;
-	m_PlayerCount = 0;
-	m_MapGameType = 0;
-	m_RandomSeed = 0;
-	m_SelectMode = 0;
-	m_StartSpotCount = 0;
 	m_CompiledBlocks.reserve( 262144 );
 }
 
@@ -167,7 +166,7 @@ void CReplay :: BuildReplay( string gameName, string statString, uint32_t war3Ve
 
 	// PlayerList (4.9)
 
-	for( vector<PIDPlayer> :: iterator i = m_Players.begin( ); i != m_Players.end( ); i++ )
+        for( vector<PIDPlayer> :: iterator i = m_Players.begin( ); i != m_Players.end( ); ++i )
 	{
 		if( (*i).first != m_HostPID )
 		{
@@ -186,7 +185,7 @@ void CReplay :: BuildReplay( string gameName, string statString, uint32_t war3Ve
 	UTIL_AppendByteArray( Replay, (uint16_t)( 7 + m_Slots.size( ) * 9 ), false );	// Size (4.10)
 	Replay.push_back( m_Slots.size( ) );											// NumSlots (4.10)
 
-	for( unsigned char i = 0; i < m_Slots.size( ); i++ )
+        for( unsigned char i = 0; i < m_Slots.size( ); ++i )
 		UTIL_AppendByteArray( Replay, m_Slots[i].GetByteArray( ) );
 
 	UTIL_AppendByteArray( Replay, m_RandomSeed, false );							// RandomSeed (4.10)
@@ -389,7 +388,7 @@ void CReplay :: ParseReplay( bool parseBlocks )
 		return;
 	}
 
-	for( int i = 0; i < NumSlots; i++ )
+        for( int i = 0; i < NumSlots; ++i )
 	{
 		unsigned char SlotData[9];
 		READB( ISS, SlotData, 9 );

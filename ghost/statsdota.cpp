@@ -1,20 +1,25 @@
 /*
 
-   Copyright [2008] [Trevor Hogan]
+	ent-ghost
+	Copyright [2011-2013] [Jack Lu]
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+	This file is part of the ent-ghost source code.
 
-       http://www.apache.org/licenses/LICENSE-2.0
+	ent-ghost is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+	ent-ghost source code is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details.
 
-   CODE PORTED FROM THE ORIGINAL GHOST PROJECT: http://ghost.pwner.org/
+	You should have received a copy of the GNU General Public License
+	along with ent-ghost source code. If not, see <http://www.gnu.org/licenses/>.
+
+	ent-ghost is modified from GHost++ (http://ghostplusplus.googlecode.com/)
+	GHost++ is Copyright [2008] [Trevor Hogan]
 
 */
 
@@ -31,21 +36,48 @@
 // CStatsDOTA
 //
 
-CStatsDOTA :: CStatsDOTA( CBaseGame *nGame ) : CStats( nGame )
+CStatsDOTA :: CStatsDOTA( CBaseGame *nGame, string nConditions, string nSaveType ) : CStats( nGame ), m_SaveType( nSaveType ), m_Winner( 0 ), m_Min( 0 ), m_Sec( 0 ), m_TowerLimit( false ), m_KillLimit( 0 ), m_TimeLimit( 0 ), m_SentinelTowers( 0 ), m_ScourgeTowers( 0 ), m_SentinelKills( 0 ), m_ScourgeKills( 0 ), m_LastCreepTime( 0 )
 {
 	CONSOLE_Print( "[STATSDOTA] using dota stats" );
 
-	for( unsigned int i = 0; i < 12; i++ )
+        for( unsigned int i = 0; i < 12; ++i )
 		m_Players[i] = NULL;
+	
+	// process the win conditions
+	if( !nConditions.empty( ) )
+	{
+		stringstream SS;
+		SS << nConditions;
 
-	m_Winner = 0;
-	m_Min = 0;
-	m_Sec = 0;
+		while( !SS.eof( ) )
+		{
+			string Condition;
+			SS >> Condition;
+
+			if( SS.fail( ) )
+			{
+				CONSOLE_Print( "[STATSDOTA] failed to process win conditions: " + nConditions );
+				break;
+			}
+			else if( Condition.length( ) >= 2 )
+			{
+				string Key = Condition.substr( 0, 2 );
+				string Value = Condition.substr( 2 );
+				
+				if( Key == "tw" )
+					m_TowerLimit = UTIL_ToUInt32( Value );
+				else if( Key == "ki" )
+					m_KillLimit = UTIL_ToUInt32( Value );
+				else if( Key == "tm" )
+					m_TimeLimit = UTIL_ToUInt32( Value );
+			}
+		}
+	}
 }
 
 CStatsDOTA :: ~CStatsDOTA( )
 {
-	for( unsigned int i = 0; i < 12; i++ )
+        for( unsigned int i = 0; i < 12; ++i )
 	{
 		if( m_Players[i] )
 			delete m_Players[i];
@@ -54,6 +86,9 @@ CStatsDOTA :: ~CStatsDOTA( )
 
 bool CStatsDOTA :: ProcessAction( CIncomingAction *Action )
 {
+	if( m_Locked )
+		return m_Winner != 0;
+
 	unsigned int i = 0;
 	BYTEARRAY *ActionData = Action->GetAction( );
 	BYTEARRAY Data;
@@ -110,15 +145,64 @@ bool CStatsDOTA :: ProcessAction( CIncomingAction *Action )
 								uint32_t VictimColour = UTIL_ToUInt32( VictimColourString );
 								CGamePlayer *Killer = m_Game->GetPlayerFromColour( ValueInt );
 								CGamePlayer *Victim = m_Game->GetPlayerFromColour( VictimColour );
-
+								
 								if( Killer && Victim )
+								{
+									if( ( ValueInt >= 1 && ValueInt <= 5 ) || ( ValueInt >= 7 && ValueInt <= 11 ) )
+									{
+										if ((ValueInt <= 5 && VictimColour <= 5) || (ValueInt >= 7 && VictimColour >= 7))
+										{
+											// He denied a team-mate, don't count that.
+										}
+										else
+										{
+											// A legit kill, lets count that.
+						
+											if (!m_Players[ValueInt])
+												m_Players[ValueInt] = new CDBDotAPlayer( );
+
+											if (ValueInt != VictimColour)
+												m_Players[ValueInt]->SetKills( m_Players[ValueInt]->GetKills() + 1 );
+											
+											if( ValueInt >= 1 && ValueInt <= 5 )
+												m_SentinelKills++;
+											else
+												m_ScourgeKills++;
+										}
+									}
+								
+									if( ( VictimColour >= 1 && VictimColour <= 5 ) || ( VictimColour >= 7 && VictimColour <= 11 ) )
+									{
+										if (!m_Players[VictimColour])
+											m_Players[VictimColour] = new CDBDotAPlayer( );
+										
+										m_Players[VictimColour]->SetDeaths( m_Players[VictimColour]->GetDeaths() + 1 );
+									}
+									
 									CONSOLE_Print( "[STATSDOTA: " + m_Game->GetGameName( ) + "] player [" + Killer->GetName( ) + "] killed player [" + Victim->GetName( ) + "]" );
+								}
+								
 								else if( Victim )
 								{
+									
+									if( ( VictimColour >= 1 && VictimColour <= 5 ) || ( VictimColour >= 7 && VictimColour <= 11 ) )
+									{
+										if (!m_Players[VictimColour])
+											m_Players[VictimColour] = new CDBDotAPlayer( );
+			
+										m_Players[VictimColour]->SetDeaths( m_Players[VictimColour]->GetDeaths() + 1 );
+									}
+									
 									if( ValueInt == 0 )
+									{
+										m_SentinelKills++;
 										CONSOLE_Print( "[STATSDOTA: " + m_Game->GetGameName( ) + "] the Sentinel killed player [" + Victim->GetName( ) + "]" );
+									}
 									else if( ValueInt == 6 )
+									{
+										m_ScourgeKills++;
 										CONSOLE_Print( "[STATSDOTA: " + m_Game->GetGameName( ) + "] the Scourge killed player [" + Victim->GetName( ) + "]" );
+									}
 								}
 							}
 							else if( KeyString.size( ) >= 8 && KeyString.substr( 0, 7 ) == "Courier" )
@@ -168,9 +252,15 @@ bool CStatsDOTA :: ProcessAction( CIncomingAction *Action )
 								string SideString;
 
 								if( Alliance == "0" )
+								{
+									m_ScourgeTowers++;
 									AllianceString = "Sentinel";
+								}
 								else if( Alliance == "1" )
+								{
+									m_SentinelTowers++;
 									AllianceString = "Scourge";
+								}
 								else
 									AllianceString = "unknown";
 
@@ -262,12 +352,79 @@ bool CStatsDOTA :: ProcessAction( CIncomingAction *Action )
 							{
 								// a player disconnected
 							}
+							else if( KeyString.size( ) >= 3 && KeyString.substr( 0, 3 ) == "CSK" )
+							{       
+								// creep kill value recieved (aprox every 3 - 4)
+								string PlayerID = KeyString.substr( 3 );
+								uint32_t ID = UTIL_ToUInt32( PlayerID );
+								
+								if( ( ID >= 1 && ID <= 5 ) || ( ID >= 7 && ID <= 11 ) )
+								{
+									if (!m_Players[ID])
+										m_Players[ID] = new CDBDotAPlayer( );
+													
+									m_Players[ID]->SetCreepKills(ValueInt);
+								}
+								
+								m_LastCreepTime = GetTime( );
+							}
+							else if( KeyString.size( ) >= 3 && KeyString.substr( 0, 3 ) == "CSD" )
+							{
+								// creep denie value recieved (aprox every 3 - 4)
+								string PlayerID = KeyString.substr( 3 );
+								uint32_t ID = UTIL_ToUInt32( PlayerID );
+								
+								if( ( ID >= 1 && ID <= 5 ) || ( ID >= 7 && ID <= 11 ) )
+								{
+									
+									if (!m_Players[ID])
+										m_Players[ID] = new CDBDotAPlayer( );
+								
+									m_Players[ID]->SetCreepDenies(ValueInt);
+								}
+								
+								m_LastCreepTime = GetTime( );
+							}
+							else if( KeyString.size( ) >= 2 && KeyString.substr( 0, 2 ) == "NK" )
+							{
+								// creep denie value recieved (aprox every 3 - 4)
+								string PlayerID = KeyString.substr( 2 );
+								uint32_t ID = UTIL_ToUInt32( PlayerID );
+								
+								if( ( ID >= 1 && ID <= 5 ) || ( ID >= 7 && ID <= 11 ) )
+								{
+									if (!m_Players[ID])
+										m_Players[ID] = new CDBDotAPlayer( );
+											
+									m_Players[ID]->SetNeutralKills(ValueInt);
+								}
+							}
+							else if( KeyString.size( ) >= 7 && KeyString.substr( 0, 6 ) == "Assist" )
+							{
+								string AssistString = KeyString.substr( 6 );
+								uint32_t Assist = UTIL_ToUInt32(AssistString);
+								
+								CGamePlayer *Player = m_Game->GetPlayerFromColour( Assist );
+								CGamePlayer *Victim = m_Game->GetPlayerFromColour( ValueInt );
+
+								if (Player && Victim)
+								{
+									if( ( Assist >= 1 && Assist <= 5 ) || ( Assist >= 7 && Assist <= 11 ) )
+									{
+										if (!m_Players[Assist])
+											m_Players[Assist] = new CDBDotAPlayer( );
+
+										m_Players[Assist]->SetAssists( m_Players[Assist]->GetAssists() + 1 );
+									}
+									//CONSOLE_Print( "[OBSERVER: " + m_Game->GetGameName( ) + "] Assist detected on team " + UTIL_ToString(Player->GetTeam()) + " by: " + Player->GetName() );
+								}
+							}
 						}
 						else if( DataString == "Global" )
 						{
 							// these are only received at the end of the game
 
-							if( KeyString == "Winner" )
+							if( KeyString == "Winner" && m_Winner != 1 && m_Winner != 2 )
 							{
 								// Value 1 -> sentinel
 								// Value 2 -> scourge
@@ -359,16 +516,96 @@ bool CStatsDOTA :: ProcessAction( CIncomingAction *Action )
 						i += 12 + Data.size( ) + Key.size( );
 					}
 					else
-						i++;
+                                                ++i;
 				}
 				else
-					i++;
+                                        ++i;
 			}
 			else
-				i++;
+                                ++i;
 		}
 		else
-			i++;
+                        ++i;
+	}
+	
+	// set winner if any win conditions have been met
+	if( m_Winner == 0 )
+	{
+		if( m_KillLimit != 0 )
+		{
+			if( m_SentinelKills >= m_KillLimit )
+			{
+				m_Winner = 1;
+				return true;
+			}
+			else if( m_ScourgeKills >= m_KillLimit )
+			{
+				m_Winner = 2;
+				return true;
+			}
+		}
+		
+		if( m_TowerLimit != 0)
+		{
+			if( m_SentinelTowers >= m_TowerLimit )
+			{
+				m_Winner = 1;
+				return true;
+			}
+			else if( m_ScourgeTowers >= m_TowerLimit )
+			{
+				m_Winner = 2;
+				return true;
+			}
+		}
+		
+		if( m_TimeLimit != 0 && m_Game->GetGameTicks( ) > m_TimeLimit * 1000 )
+		{
+			// we must determine a winner at this point
+			// or at least we must try...!
+			
+			if( m_SentinelKills > m_ScourgeKills )
+			{
+				m_Winner = 1;
+				return true;
+			}
+			else if( m_SentinelKills < m_ScourgeKills )
+			{
+				m_Winner = 2;
+				return true;
+			}
+			
+			// ok, base on creep kills then?
+			uint32_t SentinelTotal = 0;
+			uint32_t ScourgeTotal = 0;
+			
+			for( unsigned int i = 0; i < 12; ++i )
+			{
+				if( m_Players[i] )
+				{
+					uint32_t Colour = i;
+					
+					if( m_Players[i]->GetNewColour( ) != 0 )
+						Colour = m_Players[i]->GetNewColour( );
+
+					if( Colour >= 1 && Colour <= 5 )
+						SentinelTotal += m_Players[i]->GetCreepKills( ) + m_Players[i]->GetCreepDenies( );
+					if( Colour >= 7 && Colour <= 11 )
+						ScourgeTotal += m_Players[i]->GetCreepKills( ) + m_Players[i]->GetCreepDenies( );
+				}
+			}
+			
+			if( SentinelTotal > ScourgeTotal )
+			{
+				m_Winner = 1;
+				return true;
+			}
+			else if( SentinelTotal < ScourgeTotal )
+			{
+				m_Winner = 2;
+				return true;
+			}
+		}
 	}
 
 	return m_Winner != 0;
@@ -386,13 +623,14 @@ void CStatsDOTA :: Save( CGHost *GHost, CGHostDB *DB, uint32_t GameID )
 		unsigned int Players = 0;
 
 		// save the dotagame
-
-		GHost->m_Callables.push_back( DB->ThreadedDotAGameAdd( GameID, m_Winner, m_Min, m_Sec ) );
+		// no need to ask for lock on callables mutex: we already have it from CGame
+		
+		GHost->m_Callables.push_back( DB->ThreadedDotAGameAdd( GameID, m_Winner, m_Min, m_Sec, m_SaveType ) );
 
 		// check for invalid colours and duplicates
 		// this can only happen if DotA sends us garbage in the "id" value but we should check anyway
 
-		for( unsigned int i = 0; i < 12; i++ )
+                for( unsigned int i = 0; i < 12; ++i )
 		{
 			if( m_Players[i] )
 			{
@@ -405,7 +643,7 @@ void CStatsDOTA :: Save( CGHost *GHost, CGHostDB *DB, uint32_t GameID )
 					return;
 				}
 
-				for( unsigned int j = i + 1; j < 12; j++ )
+                                for( unsigned int j = i + 1; j < 12; ++j )
 				{
 					if( m_Players[j] && Colour == m_Players[j]->GetNewColour( ) )
 					{
@@ -418,13 +656,14 @@ void CStatsDOTA :: Save( CGHost *GHost, CGHostDB *DB, uint32_t GameID )
 		}
 
 		// save the dotaplayers
-
-		for( unsigned int i = 0; i < 12; i++ )
+		// no need to ask for lock on callables, we already have it from CGame
+		
+                for( unsigned int i = 0; i < 12; ++i )
 		{
 			if( m_Players[i] )
 			{
-				GHost->m_Callables.push_back( DB->ThreadedDotAPlayerAdd( GameID, m_Players[i]->GetColour( ), m_Players[i]->GetKills( ), m_Players[i]->GetDeaths( ), m_Players[i]->GetCreepKills( ), m_Players[i]->GetCreepDenies( ), m_Players[i]->GetAssists( ), m_Players[i]->GetGold( ), m_Players[i]->GetNeutralKills( ), m_Players[i]->GetItem( 0 ), m_Players[i]->GetItem( 1 ), m_Players[i]->GetItem( 2 ), m_Players[i]->GetItem( 3 ), m_Players[i]->GetItem( 4 ), m_Players[i]->GetItem( 5 ), m_Players[i]->GetHero( ), m_Players[i]->GetNewColour( ), m_Players[i]->GetTowerKills( ), m_Players[i]->GetRaxKills( ), m_Players[i]->GetCourierKills( ) ) );
-				Players++;
+				GHost->m_Callables.push_back( DB->ThreadedDotAPlayerAdd( GameID, m_Players[i]->GetColour( ), m_Players[i]->GetKills( ), m_Players[i]->GetDeaths( ), m_Players[i]->GetCreepKills( ), m_Players[i]->GetCreepDenies( ), m_Players[i]->GetAssists( ), m_Players[i]->GetGold( ), m_Players[i]->GetNeutralKills( ), m_Players[i]->GetItem( 0 ), m_Players[i]->GetItem( 1 ), m_Players[i]->GetItem( 2 ), m_Players[i]->GetItem( 3 ), m_Players[i]->GetItem( 4 ), m_Players[i]->GetItem( 5 ), m_Players[i]->GetHero( ), m_Players[i]->GetNewColour( ), m_Players[i]->GetTowerKills( ), m_Players[i]->GetRaxKills( ), m_Players[i]->GetCourierKills( ), m_SaveType ) );
+                                ++Players;
 			}
 		}
 

@@ -1,20 +1,25 @@
 /*
 
-   Copyright [2008] [Trevor Hogan]
+	ent-ghost
+	Copyright [2011-2013] [Jack Lu]
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+	This file is part of the ent-ghost source code.
 
-       http://www.apache.org/licenses/LICENSE-2.0
+	ent-ghost is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+	ent-ghost source code is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details.
 
-   CODE PORTED FROM THE ORIGINAL GHOST PROJECT: http://ghost.pwner.org/
+	You should have received a copy of the GNU General Public License
+	along with ent-ghost source code. If not, see <http://www.gnu.org/licenses/>.
+
+	ent-ghost is modified from GHost++ (http://ghostplusplus.googlecode.com/)
+	GHost++ is Copyright [2008] [Trevor Hogan]
 
 */
 
@@ -32,20 +37,14 @@
 // CSocket
 //
 
-CSocket :: CSocket( )
+CSocket :: CSocket( ) :  m_Socket( INVALID_SOCKET ), m_HasError( false ), m_Error( 0 )
 {
-	m_Socket = INVALID_SOCKET;
-	memset( &m_SIN, 0, sizeof( m_SIN ) );
-	m_HasError = false;
-	m_Error = 0;
+        memset( &m_SIN, 0, sizeof( m_SIN ) );
 }
 
-CSocket :: CSocket( SOCKET nSocket, struct sockaddr_in nSIN )
+CSocket :: CSocket( SOCKET nSocket, struct sockaddr_in nSIN ) : m_Socket( nSocket ), m_SIN( nSIN ), m_HasError( false ), m_Error( 0 )
 {
-	m_Socket = nSocket;
-	m_SIN = nSIN;
-	m_HasError = false;
-	m_Error = 0;
+
 }
 
 CSocket :: ~CSocket( )
@@ -155,16 +154,32 @@ void CSocket :: Reset( )
 	m_Error = 0;
 }
 
+string CSocket :: GetHostName( )
+{
+       if( m_CachedHostName.empty( ) )
+       {
+               char host[NI_MAXHOST], service[NI_MAXSERV];
+               int s = getnameinfo( ( struct sockaddr * ) &m_SIN, sizeof( m_SIN ), host, NI_MAXHOST, service, NI_MAXSERV, NI_NUMERICSERV );
+               string str( host );
+
+               m_CachedHostName = str;
+
+               if( m_CachedHostName.empty( ) )
+                       m_CachedHostName = "Unknown";
+
+               return str;
+       }
+       else
+               return m_CachedHostName;
+}
+
 //
 // CTCPSocket
 //
 
-CTCPSocket :: CTCPSocket( ) : CSocket( )
+CTCPSocket :: CTCPSocket( ) : CSocket( ), m_Connected( false ), m_LastRecv( GetTime( ) ), m_LastSend( GetTime( ) )
 {
 	Allocate( SOCK_STREAM );
-	m_Connected = false;
-	m_LastRecv = GetTime( );
-	m_LastSend = GetTime( );
 
 	// make socket non blocking
 
@@ -251,24 +266,8 @@ void CTCPSocket :: DoRecv( fd_set *fd )
 
 		char buffer[1024];
 		int c = recv( m_Socket, buffer, 1024, 0 );
-
-		if( c == SOCKET_ERROR && GetLastError( ) != EWOULDBLOCK )
-		{
-			// receive error
-
-			m_HasError = true;
-			m_Error = GetLastError( );
-			CONSOLE_Print( "[TCPSOCKET] error (recv) - " + GetErrorString( ) );
-			return;
-		}
-		else if( c == 0 )
-		{
-			// the other end closed the connection
-
-			CONSOLE_Print( "[TCPSOCKET] closed by remote host" );
-			m_Connected = false;
-		}
-		else if( c > 0 )
+		
+		if( c > 0 )
 		{
 			// success! add the received data to the buffer
 
@@ -287,6 +286,22 @@ void CTCPSocket :: DoRecv( fd_set *fd )
 			m_RecvBuffer += string( buffer, c );
 			m_LastRecv = GetTime( );
 		}
+		else if( c == SOCKET_ERROR && GetLastError( ) != EWOULDBLOCK )
+		{
+			// receive error
+
+			m_HasError = true;
+			m_Error = GetLastError( );
+			CONSOLE_Print( "[TCPSOCKET] error (recv) - " + GetErrorString( ) );
+			return;
+		}
+		else if( c == 0 )
+		{
+			// the other end closed the connection
+
+			CONSOLE_Print( "[TCPSOCKET] closed by remote host" );
+			m_Connected = false;
+		}
 	}
 }
 
@@ -300,17 +315,8 @@ void CTCPSocket :: DoSend( fd_set *send_fd )
 		// socket is ready, send it
 
 		int s = send( m_Socket, m_SendBuffer.c_str( ), (int)m_SendBuffer.size( ), MSG_NOSIGNAL );
-
-		if( s == SOCKET_ERROR && GetLastError( ) != EWOULDBLOCK )
-		{
-			// send error
-
-			m_HasError = true;
-			m_Error = GetLastError( );
-			CONSOLE_Print( "[TCPSOCKET] error (send) - " + GetErrorString( ) );
-			return;
-		}
-		else if( s > 0 )
+		
+		if( s > 0 )
 		{
 			// success! only some of the data may have been sent, remove it from the buffer
 
@@ -328,6 +334,15 @@ void CTCPSocket :: DoSend( fd_set *send_fd )
 
 			m_SendBuffer = m_SendBuffer.substr( s );
 			m_LastSend = GetTime( );
+		}
+		else if( s == SOCKET_ERROR && GetLastError( ) != EWOULDBLOCK )
+		{
+			// send error
+
+			m_HasError = true;
+			m_Error = GetLastError( );
+			CONSOLE_Print( "[TCPSOCKET] error (send) - " + GetErrorString( ) );
+			return;
 		}
 	}
 }
@@ -354,9 +369,9 @@ void CTCPSocket :: SetNoDelay( bool noDelay )
 // CTCPClient
 //
 
-CTCPClient :: CTCPClient( ) : CTCPSocket( )
+CTCPClient :: CTCPClient( ) : CTCPSocket( ), m_Connecting( false )
 {
-	m_Connecting = false;
+
 }
 
 CTCPClient :: ~CTCPClient( )
@@ -779,19 +794,19 @@ void CUDPServer :: RecvFrom( fd_set *fd, struct sockaddr_in *sin, string *messag
 		int c = recvfrom( m_Socket, buffer, 1024, 0, (struct sockaddr *)sin, (socklen_t *)&AddrLen );
 #endif
 
-		if( c == SOCKET_ERROR && GetLastError( ) != EWOULDBLOCK )
+		if( c > 0 )
+		{
+			// success!
+
+			*message = string( buffer, c );
+		}
+		else if( c == SOCKET_ERROR && GetLastError( ) != EWOULDBLOCK )
 		{
 			// receive error
 
 			m_HasError = true;
 			m_Error = GetLastError( );
 			CONSOLE_Print( "[UDPSERVER] error (recvfrom) - " + GetErrorString( ) );
-		}
-		else if( c > 0 )
-		{
-			// success!
-
-			*message = string( buffer, c );
 		}
 	}
 }

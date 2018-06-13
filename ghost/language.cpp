@@ -1,20 +1,25 @@
 /*
 
-   Copyright [2008] [Trevor Hogan]
+	ent-ghost
+	Copyright [2011-2013] [Jack Lu]
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+	This file is part of the ent-ghost source code.
 
-       http://www.apache.org/licenses/LICENSE-2.0
+	ent-ghost is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+	ent-ghost source code is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details.
 
-   CODE PORTED FROM THE ORIGINAL GHOST PROJECT: http://ghost.pwner.org/
+	You should have received a copy of the GNU General Public License
+	along with ent-ghost source code. If not, see <http://www.gnu.org/licenses/>.
+
+	ent-ghost is modified from GHost++ (http://ghostplusplus.googlecode.com/)
+	GHost++ is Copyright [2008] [Trevor Hogan]
 
 */
 
@@ -473,15 +478,13 @@ string CLanguage :: KickingPlayersWithPingsGreaterThan( string total, string pin
 	return Out;
 }
 
-string CLanguage :: HasPlayedGamesWithThisBot( string user, string firstgame, string lastgame, string totalgames, string avgloadingtime, string avgstay )
+string CLanguage :: HasPlayedGamesWithThisBot( string user, string totalgames, string avgstay, string playtime )
 {
 	string Out = m_CFG->GetString( "lang_0061", "lang_0061" );
 	UTIL_Replace( Out, "$USER$", user );
-	UTIL_Replace( Out, "$FIRSTGAME$", firstgame );
-	UTIL_Replace( Out, "$LASTGAME$", lastgame );
 	UTIL_Replace( Out, "$TOTALGAMES$", totalgames );
-	UTIL_Replace( Out, "$AVGLOADINGTIME$", avgloadingtime );
 	UTIL_Replace( Out, "$AVGSTAY$", avgstay );
+	UTIL_Replace( Out, "$PLAYTIME$", playtime );
 	return Out;
 }
 
@@ -569,7 +572,7 @@ string CLanguage :: YourLoadingTimeWas( string loadingtime )
 	return Out;
 }
 
-string CLanguage :: HasPlayedDotAGamesWithThisBot( string user, string totalgames, string totalwins, string totallosses, string totalkills, string totaldeaths, string totalcreepkills, string totalcreepdenies, string totalassists, string totalneutralkills, string totaltowerkills, string totalraxkills, string totalcourierkills, string avgkills, string avgdeaths, string avgcreepkills, string avgcreepdenies, string avgassists, string avgneutralkills, string avgtowerkills, string avgraxkills, string avgcourierkills )
+string CLanguage :: HasPlayedDotAGamesWithThisBot( string user, string totalgames, string totalwins, string totallosses, string totalkills, string totaldeaths, string totalcreepkills, string totalcreepdenies, string totalassists, string totalneutralkills, string totaltowerkills, string totalraxkills, string totalcourierkills, string avgkills, string avgdeaths, string avgcreepkills, string avgcreepdenies, string avgassists, string avgneutralkills, string avgtowerkills, string avgraxkills, string avgcourierkills, string score, string category )
 {
 	string Out = m_CFG->GetString( "lang_0074", "lang_0074" );
 	UTIL_Replace( Out, "$USER$", user );
@@ -594,12 +597,69 @@ string CLanguage :: HasPlayedDotAGamesWithThisBot( string user, string totalgame
 	UTIL_Replace( Out, "$AVGTOWERKILLS$", avgtowerkills );
 	UTIL_Replace( Out, "$AVGRAXKILLS$", avgraxkills );
 	UTIL_Replace( Out, "$AVGCOURIERKILLS$", avgcourierkills );
+	UTIL_Replace( Out, "$SCORE$", score );
+	UTIL_Replace( Out, "$CATEGORY$", category );
 	return Out;
 }
 
-string CLanguage :: HasntPlayedDotAGamesWithThisBot( string user )
+string CLanguage :: HasPlayedVampGamesWithThisBot( string user, string totalgames, string humangames, string vampgames, string humanwins, string vampwins, string humanlosses, string vamplosses, string vampkills, string mincc, string avgcc, string minbase, string avgbase )
+{
+	string Out = m_CFG->GetString( "lang_0221", "lang_0221" );
+	UTIL_Replace( Out, "$USER$", user );
+	UTIL_Replace( Out, "$TOTALGAMES$", totalgames );
+	UTIL_Replace( Out, "$VAMPGAMES$", vampgames );
+	UTIL_Replace( Out, "$HUMANGAMES$", humangames );
+	UTIL_Replace( Out, "$HUMANWINS$", humanwins );
+	UTIL_Replace( Out, "$VAMPWINS$", vampwins );
+	UTIL_Replace( Out, "$HUMANLOSSES$", humanlosses );
+	UTIL_Replace( Out, "$VAMPLOSSES$", vamplosses );
+	UTIL_Replace( Out, "$VAMPKILLS$", vampkills );
+	UTIL_Replace( Out, "$MINCC$", mincc );
+	UTIL_Replace( Out, "$AVGCC$", avgcc );
+	UTIL_Replace( Out, "$MINBASE$", minbase );
+	UTIL_Replace( Out, "$AVGBASE$", avgbase );
+	return Out;
+}
+
+string CLanguage :: HasPlayedTreeGamesWithThisBot( string user, string totalgames, string totalwins, string totallosses, string totalkills, string totaltks, string totaldeaths, string totalsaves, string avgkills, string avgtks, string avgdeaths, string avgsaves, string totalentgames, string totalinfernalgames )
+{
+	string Out = m_CFG->GetString( "lang_00742", "lang_00742" );
+	UTIL_Replace( Out, "$USER$", user );
+	UTIL_Replace( Out, "$TOTALGAMES$", totalgames );
+	UTIL_Replace( Out, "$TOTALWINS$", totalwins );
+	UTIL_Replace( Out, "$TOTALLOSSES$", totallosses );
+	UTIL_Replace( Out, "$TOTALKILLS$", totalkills );
+	UTIL_Replace( Out, "$TOTALTKS$", totaltks );
+	UTIL_Replace( Out, "$TOTALDEATHS$", totaldeaths );
+	UTIL_Replace( Out, "$TOTALSAVES$", totalsaves );
+	UTIL_Replace( Out, "$AVGKILLS$", avgkills );
+	UTIL_Replace( Out, "$AVGTKS$", avgtks );
+	UTIL_Replace( Out, "$AVGDEATHS$", avgdeaths );
+	UTIL_Replace( Out, "$AVGSAVES$", avgsaves );
+    UTIL_Replace( Out, "$TOTALENTGAMES$", totalentgames );
+    UTIL_Replace( Out, "$TOTALINFERNALGAMES$", totalinfernalgames );
+
+	return Out;
+}
+
+string CLanguage :: HasntPlayedDotAGamesWithThisBot( string user, string category )
 {
 	string Out = m_CFG->GetString( "lang_0075", "lang_0075" );
+	UTIL_Replace( Out, "$USER$", user );
+	UTIL_Replace( Out, "$CATEGORY$", category );
+	return Out;
+}
+
+string CLanguage :: HasntPlayedVampGamesWithThisBot( string user )
+{
+	string Out = m_CFG->GetString( "lang_0222", "lang_0222" );
+	UTIL_Replace( Out, "$USER$", user );
+	return Out;
+}
+
+string CLanguage :: HasntPlayedTreeGamesWithThisBot( string user )
+{
+	string Out = m_CFG->GetString( "lang_00752", "lang_00752" );
 	UTIL_Replace( Out, "$USER$", user );
 	return Out;
 }
@@ -1531,5 +1591,45 @@ string CLanguage :: PlayerReconnectedWithGProxy( string name )
 {
 	string Out = m_CFG->GetString( "lang_0220", "lang_0220" );
 	UTIL_Replace( Out, "$NAME$", name );
+	return Out;
+}
+
+string CLanguage :: CantKickPlayers( )
+{
+	return m_CFG->GetString( "lang_0223", "lang_0223" );
+}
+
+string CLanguage :: UnableToCreateGameInvalidCharacters( string gamename )
+{
+	string Out = m_CFG->GetString( "lang_0224", "lang_0224" );
+	UTIL_Replace( Out, "$GAMENAME$", gamename );
+	return Out;
+}
+
+string CLanguage :: TeamForfeited( string team )
+{
+	string Out = m_CFG->GetString( "lang_0225", "lang_0225" );
+	UTIL_Replace( Out, "$TEAM$", team );
+	return Out;
+}
+
+string CLanguage :: ForfeitStatsWarning( )
+{
+	return m_CFG->GetString( "lang_0226", "lang_0226" );
+}
+
+string CLanguage :: ForfeitVote( string user )
+{
+	string Out = m_CFG->GetString( "lang_0227", "lang_0227" );
+	UTIL_Replace( Out, "$USER$", user );
+	return Out;
+}
+
+string CLanguage :: ForfeitVotesNeeded( string votes, string total, string team )
+{
+	string Out = m_CFG->GetString( "lang_0228", "lang_0228" );
+	UTIL_Replace( Out, "$VOTES$", votes );
+	UTIL_Replace( Out, "$TOTAL$", total );
+	UTIL_Replace( Out, "$TEAM$", team );
 	return Out;
 }

@@ -1,20 +1,25 @@
 /*
 
-   Copyright [2008] [Trevor Hogan]
+	ent-ghost
+	Copyright [2011-2013] [Jack Lu]
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+	This file is part of the ent-ghost source code.
 
-       http://www.apache.org/licenses/LICENSE-2.0
+	ent-ghost is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+	ent-ghost source code is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details.
 
-   CODE PORTED FROM THE ORIGINAL GHOST PROJECT: http://ghost.pwner.org/
+	You should have received a copy of the GNU General Public License
+	along with ent-ghost source code. If not, see <http://www.gnu.org/licenses/>.
+
+	ent-ghost is modified from GHost++ (http://ghostplusplus.googlecode.com/)
+	GHost++ is Copyright [2008] [Trevor Hogan]
 
 */
 
@@ -57,6 +62,12 @@ public:
 		SID_WARDEN					= 94,	// 0x5E
 		SID_FRIENDSLIST				= 101,	// 0x65
 		SID_FRIENDSUPDATE			= 102,	// 0x66
+		SID_CLANCREATIONINVITATION	= 114,	// 0x72
+		SID_CLANINVITATION			= 119,  // 0x77
+		SID_CLANREMOVEMEMBER    	= 120,  // 0x78
+		SID_CLANINVITATIONRESPONSE	= 121,	// 0x79
+		SID_CLANCHANGERANK			= 122,	// 0x7A
+		SID_CLANSETMOTD 			= 123,	// 0x7B
 		SID_CLANMEMBERLIST			= 125,	// 0x7D
 		SID_CLANMEMBERSTATUSCHANGE	= 127	// 0x7F
 	};
@@ -87,6 +98,14 @@ public:
 		EID_EMOTE				= 23	// emote
 	};
 
+	enum RankCode {
+		CLAN_INITIATE = 0,		// 0x00 First week member
+		CLAN_PARTIAL_MEMBER = 1,	// 0x01 Peon
+		CLAN_MEMBER = 2,		// 0x02 Grunt
+		CLAN_OFFICER = 3,		// 0x03 Shaman
+		CLAN_LEADER = 4			// 0x04 Chieftain
+	};
+
 private:
 	BYTEARRAY m_ClientToken;			// set in constructor
 	BYTEARRAY m_LogonType;				// set in RECEIVE_SID_AUTH_INFO
@@ -99,6 +118,8 @@ private:
 	BYTEARRAY m_Salt;					// set in RECEIVE_SID_AUTH_ACCOUNTLOGON
 	BYTEARRAY m_ServerPublicKey;		// set in RECEIVE_SID_AUTH_ACCOUNTLOGON
 	BYTEARRAY m_UniqueName;				// set in RECEIVE_SID_ENTERCHAT
+	BYTEARRAY m_ClanLastInviteTag;		// set in RECEIVE_SID_CLANCREATIONINVITATION, SID_CLANINVITATIONRESPONSE
+	BYTEARRAY m_ClanLastInviteName;		// set in RECEIVE_SID_CLANCREATIONINVITATION, SID_CLANINVITATIONRESPONSE
 
 public:
 	CBNETProtocol( );
@@ -136,6 +157,8 @@ public:
 	vector<CIncomingFriendList *> RECEIVE_SID_FRIENDSLIST( BYTEARRAY data );
 	vector<CIncomingClanList *> RECEIVE_SID_CLANMEMBERLIST( BYTEARRAY data );
 	CIncomingClanList *RECEIVE_SID_CLANMEMBERSTATUSCHANGE( BYTEARRAY data );
+	string RECEIVE_SID_CLANCREATIONINVITATION( BYTEARRAY data );
+	string RECEIVE_SID_CLANINVITATIONRESPONSE( BYTEARRAY data );
 
 	// send functions
 
@@ -159,6 +182,12 @@ public:
 	BYTEARRAY SEND_SID_WARDEN( BYTEARRAY wardenResponse );
 	BYTEARRAY SEND_SID_FRIENDSLIST( );
 	BYTEARRAY SEND_SID_CLANMEMBERLIST( );
+	BYTEARRAY SEND_SID_CLANINVITATION( string accountName );
+	BYTEARRAY SEND_SID_CLANREMOVEMEMBER( string accountName );
+	BYTEARRAY SEND_SID_CLANCHANGERANK( string accountName, CBNETProtocol :: RankCode rank );
+	BYTEARRAY SEND_SID_CLANSETMOTD( string motd );
+	BYTEARRAY SEND_SID_CLANCREATIONINVITATION( bool accept );
+	BYTEARRAY SEND_SID_CLANINVITATIONRESPONSE( bool accept );
 
 	// other functions
 
@@ -198,16 +227,16 @@ class CIncomingChatEvent
 {
 private:
 	CBNETProtocol :: IncomingChatEvent m_ChatEvent;
-	uint32_t m_Ping;
+        int32_t m_Ping;
 	string m_User;
 	string m_Message;
 
 public:
-	CIncomingChatEvent( CBNETProtocol :: IncomingChatEvent nChatEvent, uint32_t nPing, string nUser, string nMessage );
+        CIncomingChatEvent( CBNETProtocol :: IncomingChatEvent nChatEvent, int32_t nPing, string nUser, string nMessage );
 	~CIncomingChatEvent( );
 
 	CBNETProtocol :: IncomingChatEvent GetChatEvent( )	{ return m_ChatEvent; }
-	uint32_t GetPing( )									{ return m_Ping; }
+        int32_t GetPing( )									{ return m_Ping; }
 	string GetUser( )									{ return m_User; }
 	string GetMessage( )								{ return m_Message; }
 };

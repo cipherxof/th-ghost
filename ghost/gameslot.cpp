@@ -1,20 +1,25 @@
 /*
 
-   Copyright [2008] [Trevor Hogan]
+	ent-ghost
+	Copyright [2011-2013] [Jack Lu]
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+	This file is part of the ent-ghost source code.
 
-       http://www.apache.org/licenses/LICENSE-2.0
+	ent-ghost is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+	ent-ghost source code is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details.
 
-   CODE PORTED FROM THE ORIGINAL GHOST PROJECT: http://ghost.pwner.org/
+	You should have received a copy of the GNU General Public License
+	along with ent-ghost source code. If not, see <http://www.gnu.org/licenses/>.
+
+	ent-ghost is modified from GHost++ (http://ghostplusplus.googlecode.com/)
+	GHost++ is Copyright [2008] [Trevor Hogan]
 
 */
 
@@ -25,7 +30,7 @@
 // CGameSlot
 //
 
-CGameSlot :: CGameSlot( BYTEARRAY &n )
+CGameSlot :: CGameSlot( BYTEARRAY &n ) : m_PID( 0 ), m_DownloadStatus( 255 ), m_SlotStatus( SLOTSTATUS_OPEN ), m_Computer( 0 ), m_Team( 0 ), m_Colour( 1 ), m_Race( SLOTRACE_RANDOM ), m_ComputerType( SLOTCOMP_NORMAL ), m_Handicap( 100 )
 {
 	if( n.size( ) >= 7 )
 	{
@@ -39,39 +44,16 @@ CGameSlot :: CGameSlot( BYTEARRAY &n )
 
 		if( n.size( ) >= 8 )
 			m_ComputerType = n[7];
-		else
-			m_ComputerType = SLOTCOMP_NORMAL;
 
 		if( n.size( ) >= 9 )
 			m_Handicap = n[8];
-		else
-			m_Handicap = 100;
-	}
-	else
-	{
-		m_PID = 0;
-		m_DownloadStatus = 255;
-		m_SlotStatus = SLOTSTATUS_OPEN;
-		m_Computer = 0;
-		m_Team = 0;
-		m_Colour = 1;
-		m_Race = SLOTRACE_RANDOM;
-		m_ComputerType = SLOTCOMP_NORMAL;
-		m_Handicap = 100;
 	}
 }
 
 CGameSlot :: CGameSlot( unsigned char nPID, unsigned char nDownloadStatus, unsigned char nSlotStatus, unsigned char nComputer, unsigned char nTeam, unsigned char nColour, unsigned char nRace, unsigned char nComputerType, unsigned char nHandicap )
+    : m_PID( nPID ), m_DownloadStatus( nDownloadStatus ), m_SlotStatus( nSlotStatus ), m_Computer( nComputer ), m_Team( nTeam ), m_Colour( nColour ), m_Race( nRace ), m_ComputerType( nComputerType ), m_Handicap( nHandicap )
 {
-	m_PID = nPID;
-	m_DownloadStatus = nDownloadStatus;
-	m_SlotStatus = nSlotStatus;
-	m_Computer = nComputer;
-	m_Team = nTeam;
-	m_Colour = nColour;
-	m_Race = nRace;
-	m_ComputerType = nComputerType;
-	m_Handicap = nHandicap;
+
 }
 
 CGameSlot :: ~CGameSlot( )

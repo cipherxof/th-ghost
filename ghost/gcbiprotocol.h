@@ -23,49 +23,64 @@
 
 */
 
-#ifndef GPSPROTOCOL_H
-#define GPSPROTOCOL_H
+#ifndef GCBIPROTOCOL_H
+#define GCBIPROTOCOL_H
 
 //
-// CGameProtocol
+// CGCBIProtocol
 //
 
-#define GPS_HEADER_CONSTANT			248
+#define GCBI_HEADER_CONSTANT		249
 
-#define REJECTGPS_INVALID			1
-#define REJECTGPS_NOTFOUND			2
+#define REJECTGCBI_INVALID			1
+#define REJECTGCBI_NOTFOUND			2
 
-class CGPSProtocol
+class CIncomingGarenaUser;
+
+class CGCBIProtocol
 {
 public:
 	enum Protocol {
-		GPS_INIT				= 1,
-		GPS_RECONNECT			= 2,
-		GPS_ACK					= 3,
-		GPS_REJECT				= 4
+		GCBI_INIT				= 1
 	};
 
-	CGPSProtocol( );
-	~CGPSProtocol( );
+	CGCBIProtocol( );
+	~CGCBIProtocol( );
 
 	// receive functions
+	CIncomingGarenaUser *RECEIVE_GCBI_INIT( BYTEARRAY data );
 
 	// send functions
-
-	BYTEARRAY SEND_GPSC_INIT( uint32_t version );
-	BYTEARRAY SEND_GPSC_RECONNECT( unsigned char PID, uint32_t reconnectKey, uint32_t lastPacket );
-	BYTEARRAY SEND_GPSC_ACK( uint32_t lastPacket );
-
-	BYTEARRAY SEND_GPSS_INIT( uint16_t reconnectPort, unsigned char PID, uint32_t reconnectKey, unsigned char numEmptyActions );
-	BYTEARRAY SEND_GPSS_RECONNECT( uint32_t lastPacket );
-	BYTEARRAY SEND_GPSS_ACK( uint32_t lastPacket );
-	BYTEARRAY SEND_GPSS_REJECT( uint32_t reason );
 
 	// other functions
 
 private:
 	bool AssignLength( BYTEARRAY &content );
 	bool ValidateLength( BYTEARRAY &content );
+};
+
+//
+// CIncomingGarenaUser
+//
+	
+class CIncomingGarenaUser
+{
+private:
+	uint32_t m_IP;
+	uint32_t m_UserID;
+	uint32_t m_RoomID;
+	uint32_t m_UserExp;
+	string m_CountryCode;
+
+public:
+	CIncomingGarenaUser( uint32_t nIP, uint32_t nUserID, uint32_t nRoomID, uint32_t nUserExp, string nCountryCode );
+	~CIncomingGarenaUser( );
+
+	uint32_t GetIP( ) { return m_IP; }
+	uint32_t GetUserID( ) { return m_UserID; }
+	uint32_t GetRoomID( ) { return m_RoomID; }
+	uint32_t GetUserExp( ) { return m_UserExp; }
+	string GetCountryCode( ) { return m_CountryCode; }
 };
 
 #endif

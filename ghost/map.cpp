@@ -1,20 +1,25 @@
 /*
 
-   Copyright [2008] [Trevor Hogan]
+	ent-ghost
+	Copyright [2011-2013] [Jack Lu]
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+	This file is part of the ent-ghost source code.
 
-       http://www.apache.org/licenses/LICENSE-2.0
+	ent-ghost is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+	ent-ghost source code is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details.
 
-   CODE PORTED FROM THE ORIGINAL GHOST PROJECT: http://ghost.pwner.org/
+	You should have received a copy of the GNU General Public License
+	along with ent-ghost source code. If not, see <http://www.gnu.org/licenses/>.
+
+	ent-ghost is modified from GHost++ (http://ghostplusplus.googlecode.com/)
+	GHost++ is Copyright [2008] [Trevor Hogan]
 
 */
 
@@ -35,30 +40,9 @@
 // CMap
 //
 
-CMap :: CMap( CGHost *nGHost )
+CMap :: CMap( CGHost *nGHost ) : m_GHost( nGHost ), m_Valid( true ), m_MapPath( "Maps\\FrozenThrone\\(12)EmeraldGardens.w3x" ), m_MapSize( UTIL_ExtractNumbers( "174 221 4 0", 4 ) ), m_MapInfo( UTIL_ExtractNumbers( "251 57 68 98", 4 ) ), m_MapCRC( UTIL_ExtractNumbers( "108 250 204 59", 4 ) ), m_MapSHA1( UTIL_ExtractNumbers( "35 81 104 182 223 63 204 215 1 17 87 234 220 66 3 185 82 99 6 13", 20 ) ), m_MapSpeed( MAPSPEED_FAST ), m_MapVisibility( MAPVIS_DEFAULT ), m_MapObservers( MAPOBS_NONE ), m_MapFlags( MAPFLAG_TEAMSTOGETHER | MAPFLAG_FIXEDTEAMS ), m_MapFilterMaker( MAPFILTER_MAKER_BLIZZARD ), m_MapFilterType( MAPFILTER_TYPE_MELEE ), m_MapFilterSize( MAPFILTER_SIZE_LARGE ), m_MapFilterObs( MAPFILTER_OBS_NONE ), m_MapOptions( MAPOPT_MELEE ), m_MapWidth( UTIL_ExtractNumbers( "172 0", 2 ) ), m_MapHeight( UTIL_ExtractNumbers( "172 0", 2 ) ), m_MapLoadInGame( false ), m_MapNumPlayers( 12 ), m_MapNumTeams( 12 )
 {
 	CONSOLE_Print( "[MAP] using hardcoded Emerald Gardens map data for Warcraft 3 version 1.24 & 1.24b" );
-	m_GHost = nGHost;
-	m_Valid = true;
-	m_MapPath = "Maps\\FrozenThrone\\(12)EmeraldGardens.w3x";
-	m_MapSize = UTIL_ExtractNumbers( "174 221 4 0", 4 );
-	m_MapInfo = UTIL_ExtractNumbers( "251 57 68 98", 4 );
-	m_MapCRC = UTIL_ExtractNumbers( "108 250 204 59", 4 );
-	m_MapSHA1 = UTIL_ExtractNumbers( "35 81 104 182 223 63 204 215 1 17 87 234 220 66 3 185 82 99 6 13", 20 );
-	m_MapSpeed = MAPSPEED_FAST;
-	m_MapVisibility = MAPVIS_DEFAULT;
-	m_MapObservers = MAPOBS_NONE;
-	m_MapFlags = MAPFLAG_TEAMSTOGETHER | MAPFLAG_FIXEDTEAMS;
-	m_MapFilterMaker = MAPFILTER_MAKER_BLIZZARD;
-	m_MapFilterType = MAPFILTER_TYPE_MELEE;
-	m_MapFilterSize = MAPFILTER_SIZE_LARGE;
-	m_MapFilterObs = MAPFILTER_OBS_NONE;
-	m_MapOptions = MAPOPT_MELEE;
-	m_MapWidth = UTIL_ExtractNumbers( "172 0", 2 );
-	m_MapHeight = UTIL_ExtractNumbers( "172 0", 2 );
-	m_MapLoadInGame = false;
-	m_MapNumPlayers = 12;
-	m_MapNumTeams = 12;
 	m_Slots.push_back( CGameSlot( 0, 255, SLOTSTATUS_OPEN, 0, 0, 0, SLOTRACE_RANDOM | SLOTRACE_SELECTABLE ) );
 	m_Slots.push_back( CGameSlot( 0, 255, SLOTSTATUS_OPEN, 0, 1, 1, SLOTRACE_RANDOM | SLOTRACE_SELECTABLE ) );
 	m_Slots.push_back( CGameSlot( 0, 255, SLOTSTATUS_OPEN, 0, 2, 2, SLOTRACE_RANDOM | SLOTRACE_SELECTABLE ) );
@@ -73,9 +57,8 @@ CMap :: CMap( CGHost *nGHost )
 	m_Slots.push_back( CGameSlot( 0, 255, SLOTSTATUS_OPEN, 0, 11, 11, SLOTRACE_RANDOM | SLOTRACE_SELECTABLE ) );
 }
 
-CMap :: CMap( CGHost *nGHost, CConfig *CFG, string nCFGFile )
+CMap :: CMap( CGHost *nGHost, CConfig *CFG, string nCFGFile ) : m_GHost( nGHost )
 {
-	m_GHost = nGHost;
 	Load( CFG, nCFGFile );
 }
 
@@ -411,7 +394,7 @@ void CMap :: Load( CConfig *CFG, string nCFGFile )
 					FileList.push_back( "war3map.w3q" );
 					bool FoundScript = false;
 
-					for( vector<string> :: iterator i = FileList.begin( ); i != FileList.end( ); i++ )
+                                        for( vector<string> :: iterator i = FileList.begin( ); i != FileList.end( ); ++i )
 					{
 						// don't use scripts\war3map.j if we've already used war3map.j (yes, some maps have both but only war3map.j is used)
 
@@ -478,6 +461,7 @@ void CMap :: Load( CConfig *CFG, string nCFGFile )
 	BYTEARRAY MapHeight;
 	uint32_t MapNumPlayers = 0;
 	uint32_t MapNumTeams = 0;
+    uint32_t MapFilterType = MAPFILTER_TYPE_SCENARIO;
 	vector<CGameSlot> Slots;
 
 	if( !m_MapData.empty( ) )
@@ -572,7 +556,7 @@ void CMap :: Load( CConfig *CFG, string nCFGFile )
 							ISS.read( (char *)&RawMapNumPlayers, 4 );	// number of players
 							uint32_t ClosedSlots = 0;
 
-							for( uint32_t i = 0; i < RawMapNumPlayers; i++ )
+                                                        for( uint32_t i = 0; i < RawMapNumPlayers; ++i )
 							{
 								CGameSlot Slot( 0, 255, SLOTSTATUS_OPEN, 0, 0, 1, SLOTRACE_RANDOM );
 								uint32_t Colour;
@@ -594,7 +578,7 @@ void CMap :: Load( CConfig *CFG, string nCFGFile )
 								else
 								{
 									Slot.SetSlotStatus( SLOTSTATUS_CLOSED );
-									ClosedSlots++;
+                                                                        ++ClosedSlots;
 								}
 
 								ISS.read( (char *)&Race, 4 );			// race
@@ -623,7 +607,7 @@ void CMap :: Load( CConfig *CFG, string nCFGFile )
 
 							ISS.read( (char *)&RawMapNumTeams, 4 );		// number of teams
 
-							for( uint32_t i = 0; i < RawMapNumTeams; i++ )
+                                                        for( uint32_t i = 0; i < RawMapNumTeams; ++i )
 							{
 								uint32_t Flags;
 								uint32_t PlayerMask;
@@ -631,11 +615,11 @@ void CMap :: Load( CConfig *CFG, string nCFGFile )
 								ISS.read( (char *)&Flags, 4 );			// flags
 								ISS.read( (char *)&PlayerMask, 4 );		// player mask
 
-								for( unsigned char j = 0; j < 12; j++ )
+                                                                for( unsigned char j = 0; j < 12; ++j )
 								{
 									if( PlayerMask & 1 )
 									{
-										for( vector<CGameSlot> :: iterator k = Slots.begin( ); k != Slots.end( ); k++ )
+                                                                                for( vector<CGameSlot> :: iterator k = Slots.begin( ); k != Slots.end( ); ++k )
 										{
 											if( (*k).GetColour( ) == j )
 												(*k).SetTeam( i );
@@ -664,10 +648,10 @@ void CMap :: Load( CConfig *CFG, string nCFGFile )
 
 							uint32_t SlotNum = 1;
 
-							for( vector<CGameSlot> :: iterator i = Slots.begin( ); i != Slots.end( ); i++ )
+                                                        for( vector<CGameSlot> :: iterator i = Slots.begin( ); i != Slots.end( ); ++i )
 							{
 								CONSOLE_Print( "[MAP] calculated map_slot" + UTIL_ToString( SlotNum ) + " = " + UTIL_ByteArrayToDecString( (*i).GetByteArray( ) ) );
-								SlotNum++;
+                                                                ++SlotNum;
 							}
 
 							if( MapOptions & MAPOPT_MELEE )
@@ -678,18 +662,19 @@ void CMap :: Load( CConfig *CFG, string nCFGFile )
 
 								unsigned char Team = 0;
 
-								for( vector<CGameSlot> :: iterator i = Slots.begin( ); i != Slots.end( ); i++ )
+                                                                for( vector<CGameSlot> :: iterator i = Slots.begin( ); i != Slots.end( ); ++i )
 								{
 									(*i).SetTeam( Team++ );
 									(*i).SetRace( SLOTRACE_RANDOM );
 								}
-							}
+                                                                MapFilterType = MAPFILTER_TYPE_MELEE;
+                            }
 
 							if( !( MapOptions & MAPOPT_FIXEDPLAYERSETTINGS ) )
 							{
 								// make races selectable
 
-								for( vector<CGameSlot> :: iterator i = Slots.begin( ); i != Slots.end( ); i++ )
+                                                                for( vector<CGameSlot> :: iterator i = Slots.begin( ); i != Slots.end( ); ++i )
 									(*i).SetRace( (*i).GetRace( ) | SLOTRACE_SELECTABLE );
 							}
 						}
@@ -762,7 +747,15 @@ void CMap :: Load( CConfig *CFG, string nCFGFile )
 	m_MapObservers = CFG->GetInt( "map_observers", MAPOBS_NONE );
 	m_MapFlags = CFG->GetInt( "map_flags", MAPFLAG_TEAMSTOGETHER | MAPFLAG_FIXEDTEAMS );
 	m_MapFilterMaker = CFG->GetInt( "map_filter_maker", MAPFILTER_MAKER_USER );
-	m_MapFilterType = CFG->GetInt( "map_filter_type", 0 );
+	
+    if( CFG->Exists( "map_filter_type" ) )
+        {
+            CONSOLE_Print( "[MAP] overriding calculated map_filter_type with config value map_filter_type = " + CFG->GetString( "map_filter_type", string( ) ) );
+            MapFilterType = CFG->GetInt( "map_filter_type", MAPFILTER_TYPE_SCENARIO );
+        }
+    
+    m_MapFilterType = MapFilterType;
+
 	m_MapFilterSize = CFG->GetInt( "map_filter_size", MAPFILTER_SIZE_LARGE );
 	m_MapFilterObs = CFG->GetInt( "map_filter_obs", MAPFILTER_OBS_NONE );
 
@@ -803,6 +796,27 @@ void CMap :: Load( CConfig *CFG, string nCFGFile )
 	m_MapDefaultHCL = CFG->GetString( "map_defaulthcl", string( ) );
 	m_MapDefaultPlayerScore = CFG->GetInt( "map_defaultplayerscore", 1000 );
 	m_MapLoadInGame = CFG->GetInt( "map_loadingame", 0 ) == 0 ? false : true;
+	m_Tournament = CFG->GetInt( "map_tournament", 0 ) == 0 ? false : true;
+	m_TournamentFakeSlot = CFG->GetInt( "map_tournamentfake", 255 );
+	
+	if( m_Tournament )
+	{
+		for( int i = 0; i <= 12; i++ )
+		{
+			uint32_t CurrentSlot = CFG->GetInt( "map_tournamentlayout" + UTIL_ToString( i ), 12 );
+			m_TournamentLayout.push_back( CurrentSlot );
+		}
+	}
+	
+	for( int i = 0; i <= 12; i++ )
+	{
+		uint32_t CurrentSlot = CFG->GetInt( "map_fakeplayer" + UTIL_ToString( i ), 255 );
+
+		if( CurrentSlot != 255 )
+			m_FakePlayers.push_back( CurrentSlot );
+	}
+	
+	m_Conditions = CFG->GetString( "map_conditions", string( ) );
 
 	if( MapNumPlayers == 0 )
 		MapNumPlayers = CFG->GetInt( "map_numplayers", 0 );
@@ -826,7 +840,7 @@ void CMap :: Load( CConfig *CFG, string nCFGFile )
 
 	if( Slots.empty( ) )
 	{
-		for( uint32_t Slot = 1; Slot <= 12; Slot++ )
+        for( uint32_t Slot = 1; Slot <= 12; ++Slot )
 		{
 			string SlotString = CFG->GetString( "map_slot" + UTIL_ToString( Slot ), string( ) );
 
@@ -842,7 +856,7 @@ void CMap :: Load( CConfig *CFG, string nCFGFile )
 		CONSOLE_Print( "[MAP] overriding slots" );
 		Slots.clear( );
 
-		for( uint32_t Slot = 1; Slot <= 12; Slot++ )
+                for( uint32_t Slot = 1; Slot <= 12; ++Slot )
 		{
 			string SlotString = CFG->GetString( "map_slot" + UTIL_ToString( Slot ), string( ) );
 
@@ -862,7 +876,7 @@ void CMap :: Load( CConfig *CFG, string nCFGFile )
 	{
 		CONSOLE_Print( "[MAP] forcing races to random" );
 
-		for( vector<CGameSlot> :: iterator i = m_Slots.begin( ); i != m_Slots.end( ); i++ )
+                for( vector<CGameSlot> :: iterator i = m_Slots.begin( ); i != m_Slots.end( ); ++i )
 			(*i).SetRace( SLOTRACE_RANDOM );
 	}
 
@@ -883,7 +897,7 @@ void CMap :: CheckValid( )
 {
 	// todotodo: should this code fix any errors it sees rather than just warning the user?
 
-	if( m_MapPath.empty( ) || m_MapPath.length( ) >= 50 )
+	if( m_MapPath.empty( ) || m_MapPath.length( ) > 53 )
 	{
 		m_Valid = false;
 		CONSOLE_Print( "[MAP] invalid map_path detected" );
@@ -994,7 +1008,7 @@ uint32_t CMap :: XORRotateLeft( unsigned char *data, uint32_t length )
 	while( i < length )
 	{
 		Val = ROTL( Val ^ data[i], 3 );
-		i++;
+                ++i;
 	}
 
 	return Val;

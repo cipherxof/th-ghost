@@ -1,20 +1,25 @@
 /*
 
-   Copyright [2008] [Trevor Hogan]
+	ent-ghost
+	Copyright [2011-2013] [Jack Lu]
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+	This file is part of the ent-ghost source code.
 
-       http://www.apache.org/licenses/LICENSE-2.0
+	ent-ghost is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+	ent-ghost source code is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details.
 
-   CODE PORTED FROM THE ORIGINAL GHOST PROJECT: http://ghost.pwner.org/
+	You should have received a copy of the GNU General Public License
+	along with ent-ghost source code. If not, see <http://www.gnu.org/licenses/>.
+
+	ent-ghost is modified from GHost++ (http://ghostplusplus.googlecode.com/)
+	GHost++ is Copyright [2008] [Trevor Hogan]
 
 */
 
@@ -22,6 +27,7 @@
 #include "util.h"
 #include "ghostdb.h"
 #include "gameprotocol.h"
+#include "gameplayer.h"
 #include "game_base.h"
 #include "stats.h"
 #include "statsw3mmd.h"
@@ -30,13 +36,10 @@
 // CStatsW3MMD
 //
 
-CStatsW3MMD :: CStatsW3MMD( CBaseGame *nGame, string nCategory ) : CStats( nGame )
+CStatsW3MMD :: CStatsW3MMD( CBaseGame *nGame, string nCategory, string nSaveType ) : CStats( nGame ), m_Category( nCategory ), m_SaveType( nSaveType ), m_NextValueID( 0 ), m_NextCheckID( 0 )
 {
 	CONSOLE_Print( "[STATSW3MMD] using Warcraft 3 Map Meta Data stats parser version 1" );
 	CONSOLE_Print( "[STATSW3MMD] using map_statsw3mmdcategory [" + nCategory + "]" );
-	m_Category = nCategory;
-	m_NextValueID = 0;
-	m_NextCheckID = 0;
 }
 
 CStatsW3MMD :: ~CStatsW3MMD( )
@@ -46,6 +49,9 @@ CStatsW3MMD :: ~CStatsW3MMD( )
 
 bool CStatsW3MMD :: ProcessAction( CIncomingAction *Action )
 {
+	if( m_Locked )
+		return false;
+
 	unsigned int i = 0;
 	BYTEARRAY *ActionData = Action->GetAction( );
 	BYTEARRAY MissionKey;
@@ -276,7 +282,7 @@ bool CStatsW3MMD :: ProcessAction( CIncomingAction *Action )
 											{
 												// replace the markers in the format string with the arguments
 
-												for( uint32_t i = 0; i < Tokens.size( ) - 2; i++ )
+                                                                                                for( uint32_t i = 0; i < Tokens.size( ) - 2; ++i )
 												{
 													// check if the marker is a PID marker
 
@@ -314,7 +320,7 @@ bool CStatsW3MMD :: ProcessAction( CIncomingAction *Action )
 									CONSOLE_Print( "[STATSW3MMD: " + m_Game->GetGameName( ) + "] unknown message type [" + Tokens[0] + "] found, ignoring" );
 							}
 
-							m_NextValueID++;
+                                                        ++m_NextValueID;
 						}
 						else if( MissionKeyString.size( ) > 4 && MissionKeyString.substr( 0, 4 ) == "chk:" )
 						{
@@ -323,7 +329,7 @@ bool CStatsW3MMD :: ProcessAction( CIncomingAction *Action )
 
 							// todotodo: cheat detection
 
-							m_NextCheckID++;
+                                                        ++m_NextCheckID;
 						}
 						else
 							CONSOLE_Print( "[STATSW3MMD: " + m_Game->GetGameName( ) + "] unknown mission key [" + MissionKeyString + "] found, ignoring" );
@@ -331,16 +337,16 @@ bool CStatsW3MMD :: ProcessAction( CIncomingAction *Action )
 						i += 15 + MissionKey.size( ) + Key.size( );
 					}
 					else
-						i++;
+                                                ++i;
 				}
 				else
-					i++;
+                                        ++i;
 			}
 			else
-				i++;
+                                ++i;
 		}
 		else
-			i++;
+                        ++i;
 	}
 
 	return false;
@@ -355,7 +361,7 @@ void CStatsW3MMD :: Save( CGHost *GHost, CGHostDB *DB, uint32_t GameID )
 		// todotodo: there's no reason to create a new callable for each entry in this map
 		// rewrite ThreadedW3MMDPlayerAdd to act more like ThreadedW3MMDVarAdd
 
-		for( map<uint32_t,string> :: iterator i = m_PIDToName.begin( ); i != m_PIDToName.end( ); i++ )
+                for( map<uint32_t,string> :: iterator i = m_PIDToName.begin( ); i != m_PIDToName.end( ); ++i )
 		{
 			string Flags = m_Flags[i->first];
 			uint32_t Leaver = 0;
@@ -382,17 +388,21 @@ void CStatsW3MMD :: Save( CGHost *GHost, CGHostDB *DB, uint32_t GameID )
 			}
 
 			CONSOLE_Print( "[STATSW3MMD: " + m_Game->GetGameName( ) + "] recorded flags [" + Flags + "] for player [" + i->second + "] with PID [" + UTIL_ToString( i->first ) + "]" );
-			GHost->m_Callables.push_back( DB->ThreadedW3MMDPlayerAdd( m_Category, GameID, i->first, i->second, m_Flags[i->first], Leaver, Practicing ) );
+			
+			// no need to ask for lock on callables mutex: we already have it from CGame
+			GHost->m_Callables.push_back( DB->ThreadedW3MMDPlayerAdd( m_Category, GameID, i->first, i->second, m_Flags[i->first], Leaver, Practicing, m_SaveType ) );
 		}
 
+		// no need to ask for lock on callables mutex: we already have it from CGame
+		
 		if( !m_VarPInts.empty( ) )
-			GHost->m_Callables.push_back( DB->ThreadedW3MMDVarAdd( GameID, m_VarPInts ) );
+			GHost->m_Callables.push_back( DB->ThreadedW3MMDVarAdd( GameID, m_VarPInts, m_SaveType ) );
 
 		if( !m_VarPReals.empty( ) )
-			GHost->m_Callables.push_back( DB->ThreadedW3MMDVarAdd( GameID, m_VarPReals ) );
+			GHost->m_Callables.push_back( DB->ThreadedW3MMDVarAdd( GameID, m_VarPReals, m_SaveType ) );
 
 		if( !m_VarPStrings.empty( ) )
-			GHost->m_Callables.push_back( DB->ThreadedW3MMDVarAdd( GameID, m_VarPStrings ) );
+			GHost->m_Callables.push_back( DB->ThreadedW3MMDVarAdd( GameID, m_VarPStrings, m_SaveType ) );
 
 		if( DB->Commit( ) )
 			CONSOLE_Print( "[STATSW3MMD: " + m_Game->GetGameName( ) + "] saving data" );
@@ -409,7 +419,7 @@ vector<string> CStatsW3MMD :: TokenizeKey( string key )
 	string Token;
 	bool Escaping = false;
 
-	for( string :: iterator i = key.begin( ); i != key.end( ); i++ )
+        for( string :: iterator i = key.begin( ); i != key.end( ); ++i )
 	{
 		if( Escaping )
 		{
@@ -453,4 +463,31 @@ vector<string> CStatsW3MMD :: TokenizeKey( string key )
 
 	Tokens.push_back( Token );
 	return Tokens;
+}
+
+bool CStatsW3MMD :: IsWinner( )
+{
+	for( map<uint32_t, string> :: iterator i = m_Flags.begin( ); i != m_Flags.end( ); ++i )
+	{
+		if( i->second == "winner" )
+			return true;
+	}
+
+	return false;
+}
+
+void CStatsW3MMD :: SetWinner( uint32_t nWinner )
+{
+	for( vector<CGamePlayer *> :: iterator i = m_Game->m_Players.begin( ); i != m_Game->m_Players.end( ); i++)
+	{
+		unsigned char playerSID = m_Game->GetSIDFromPID( (*i)->GetPID( ) );
+		
+		if( playerSID < m_Game->m_Slots.size( ) )
+		{
+			unsigned char playerTeam = m_Game->m_Slots[playerSID].GetTeam( );
+			
+			if( playerTeam == nWinner )
+				m_Flags[m_Game->m_Slots[playerSID].GetColour( )] = "winner";
+		}
+	}
 }
