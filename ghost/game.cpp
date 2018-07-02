@@ -208,8 +208,8 @@ bool CGame :: Update( void *fd, void *send_fd )
 			{
 				string result = (*i)->GetResult( );
 
-				if (result != "noreply")
-					m_GHost->m_W3HMC->SendString((*i)->GetReq() + " " + result);
+				if ((*i)->NoReply() == false)
+					m_GHost->m_W3HMC->SendString((*i)->GetReqID() + " " + result);
 
 				m_GHost->m_W3HMC->RecoverCallable( *i );
 				delete *i;

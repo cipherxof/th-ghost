@@ -41,8 +41,8 @@
 #include <cmath>
 #include <string.h>
 #include <time.h>
-#include <curl/curl.h> 
-#include <unistd.h>
+#include "curl/curl.h"
+//#include <unistd.h>
 
 #include "next_combination.h"
 
@@ -4175,7 +4175,7 @@ vector<unsigned char> CBaseGame :: BalanceSlotsRecursive( vector<unsigned char> 
 				// now calculate the team scores for all the teams that we know about (e.g. on subsequent recursion steps this will NOT be every possible team)
 
 				vector<unsigned char> :: iterator CurrentPID = TestOrdering.begin( );
-				double TeamScores[m_GHost->m_MaxPlayers];
+				double *TeamScores = new double[m_GHost->m_MaxPlayers];
 
 				for( unsigned char j = StartTeam; j < m_GHost->m_MaxPlayers; ++j )
 				{
@@ -4266,8 +4266,8 @@ void CBaseGame :: BalanceSlots( )
 	// use an array of 13 elements for 12 players because GHost++ allocates PID's from 1-12 (i.e. excluding 0) and we use the PID to index the array
 
 	vector<unsigned char> PlayerIDs;
-	unsigned char TeamSizes[m_GHost->m_MaxPlayers];
-	double PlayerScores[m_GHost->m_MaxPlayers + 1];
+	unsigned char *TeamSizes = new unsigned char[m_GHost->m_MaxPlayers];
+	double *PlayerScores = new double[m_GHost->m_MaxPlayers + 1];
 	memset( TeamSizes, 0, sizeof( unsigned char ) * m_GHost->m_MaxPlayers );
 
 	for( vector<CGamePlayer *> :: iterator i = m_Players.begin( ); i != m_Players.end( ); ++i )

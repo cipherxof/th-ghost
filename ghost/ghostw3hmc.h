@@ -1,25 +1,25 @@
 /*
 
-	ent-ghost
-	Copyright [2011-2013] [Jack Lu]
+th-ghost
+Copyright [2018] [TriggerHappy]
 
-	This file is part of the ent-ghost source code.
+This file is part of the ent-ghost source code.
 
-	ent-ghost is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+th-ghost is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-	ent-ghost source code is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-	GNU General Public License for more details.
+th-ghost source code is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with ent-ghost source code. If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with th-ghost source code. If not, see <http://www.gnu.org/licenses/>.
 
-	ent-ghost is modified from GHost++ (http://ghostplusplus.googlecode.com/)
-	GHost++ is Copyright [2008] [Trevor Hogan]
+th-ghost is modified from GHost++ (http://ghostplusplus.googlecode.com/)
+GHost++ is Copyright [2008] [Trevor Hogan]
 
 */
 
@@ -65,26 +65,29 @@ protected:
 	string m_Args;
 	string m_Result;
 	BYTEARRAY m_ActionData;
-	string m_SpecialReq;
+	string m_ReqID;
 	CBaseGame *m_Game;
+	bool m_NoReply = false;
 
 public:
-	CCallableDoCURL( CIncomingAction *nAction, string nArgs, CBaseGame *nGame, BYTEARRAY nActionData, string nSpecialReq ) : CBaseCallable( ), m_Action( nAction ), m_Args( nArgs ), m_Game( nGame ), m_ActionData( nActionData ), m_SpecialReq( nSpecialReq ), m_Result( "" ) { }
+	CCallableDoCURL( CIncomingAction *nAction, string nArgs, CBaseGame *nGame, BYTEARRAY nActionData, string nSpecialReq ) : CBaseCallable( ), m_Action( nAction ), m_Args( nArgs ), m_Game( nGame ), m_ActionData( nActionData ), m_ReqID( nSpecialReq ), m_Result( "" ) { }
 	virtual ~CCallableDoCURL( );
 
 	virtual string GetArgs( )					{ return m_Args; }
 	virtual string GetResult( )					{ return m_Result; }
 	virtual CIncomingAction *GetAction( )		{ return m_Action; }
 	virtual BYTEARRAY GetActionData( )			{ return m_ActionData; }
-	virtual string GetReq( )					{ return m_SpecialReq; }
+	virtual string GetReqID( )					{ return m_ReqID; }
+	virtual bool NoReply()						{ return m_NoReply; }
 
 	virtual void SetResult( string nResult )	{ m_Result = nResult; }
+	virtual void SetNoReply( bool flag )		{ m_NoReply = flag; }
 };
 
 class CCURLCallableDoCURL : public CCallableDoCURL
 {
 public:
-	CCURLCallableDoCURL( CIncomingAction *nAction, string nArgs, CBaseGame *nGame, BYTEARRAY nActionData, string nSpecialReq ) : CBaseCallable( ), CCallableDoCURL( nAction, nArgs, nGame, nActionData, nSpecialReq ) { }
+	CCURLCallableDoCURL( CIncomingAction *nAction, string nArgs, CBaseGame *nGame, BYTEARRAY nActionData, string nReqID ) : CBaseCallable( ), CCallableDoCURL( nAction, nArgs, nGame, nActionData, nReqID) { }
 	virtual ~CCURLCallableDoCURL( ) { }
 
 	virtual void operator( )( );

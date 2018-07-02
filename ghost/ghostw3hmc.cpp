@@ -1,24 +1,24 @@
 /*
 
-	ent-ghost
-	Copyright [2011-2013] [Jack Lu]
+	th-ghost
+	Copyright [2018] [TriggerHappy]
 
 	This file is part of the ent-ghost source code.
 
-	ent-ghost is free software: you can redistribute it and/or modify
+	th-ghost is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	ent-ghost source code is distributed in the hope that it will be useful,
+	th-ghost source code is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 	GNU General Public License for more details.
 
 	You should have received a copy of the GNU General Public License
-	along with ent-ghost source code. If not, see <http://www.gnu.org/licenses/>.
+	along with th-ghost source code. If not, see <http://www.gnu.org/licenses/>.
 
-	ent-ghost is modified from GHost++ (http://ghostplusplus.googlecode.com/)
+	th-ghost is modified from GHost++ (http://ghostplusplus.googlecode.com/)
 	GHost++ is Copyright [2008] [Trevor Hogan]
 
 */
@@ -40,12 +40,14 @@
 
 #ifdef WIN32
  #include <winsock.h>
+ #include "curl/curl.h"
+#else
+ #include <curl/curl.h>
+ #include <unistd.h>
 #endif
 
 #include <mysql/mysql.h>
-#include <curl/curl.h>
 #include <boost/thread.hpp>
-#include <unistd.h>
 
 #define W3HMC_REQUEST_INIT			1
 #define W3HMC_REQUEST_HTTP			2
@@ -53,6 +55,16 @@
 
 #define W3HMC_ACTION_SET_ARGS			1
 #define W3HMC_ACTION_EXECUTE			2
+
+#define W3HMC_ARG_CURL_URL			"1"
+#define W3HMC_ARG_CURL_POST			"2"
+#define W3HMC_ARG_CURL_NOREPLY		"3"
+#define W3HMC_ARG_CURL_APPENDSECRET	"4"
+#define W3HMC_ARG_CURL_PARAMATERS	"5"
+#define W3HMC_ARG_CURL_APPENDREALM	"6"
+#define W3HMC_ARG_CURL_APPENDNAME	"7"
+#define W3HMC_ARG_CURL_ADDHEADER	"8"
+#define W3HMC_ARG_CURL_FOLLOWLOC	"9"
 
 //
 // CGHostDBMySQL
@@ -64,6 +76,7 @@ CGHostW3HMC :: CGHostW3HMC( CConfig *CFG )
 
 	m_DebugMode = (CFG->GetInt( "bot_w3hmcdebug", 0 ) == 1);
 	m_OutstandingCallables = 0;
+	m_Locked = false;
 }
 
 CGHostW3HMC :: ~CGHostW3HMC( )
@@ -172,18 +185,24 @@ std::map<std::string, std::string> CGHostW3HMC :: ParseArguments( string args )
 	istringstream SS(args);
 	string CurrentKey, LastKey, Args = "";
 
+	bool isArgName = true;
+
 	while ( getline( SS, CurrentKey, ' ' ) ) 
 	{
-		if (LastKey.length() > 0) 
-			Arg[LastKey] = CurrentKey;
+		if (!isArgName)
+		{
+			if (LastKey.length() > 0)
+				Arg[LastKey] = CurrentKey;
+		}
 
+		isArgName = !isArgName;
 		LastKey = CurrentKey;
 	}	
 
 	return Arg;
 }
 
-string W3HMC_CURLRequest( string args )
+string W3HMC_CURLRequest( string args, bool *noReply )
 {
 	string Result = "";
 
@@ -194,35 +213,44 @@ string W3HMC_CURLRequest( string args )
 
 	// Parse the arguments string
 	string URL, ReqParams, CurrentKey, LastKey = "";
-	bool IsPost, NoReply = false;
+	bool IsPost, FollowLocation = false;
 	istringstream SS(args);
+
+	bool isArgName = true;
 
 	while ( getline( SS, CurrentKey, ' ' ) ) 
 	{
-		if (LastKey.compare("url") == 0)
-			URL = CurrentKey;
+		if (!isArgName)
+		{
+			if (LastKey.compare(W3HMC_ARG_CURL_URL) == 0)
+				URL = CurrentKey;
 
-		if (LastKey.compare("post") == 0 && CurrentKey == "true")
-			IsPost = true;
+			if (LastKey.compare(W3HMC_ARG_CURL_POST) == 0)
+				IsPost = (CurrentKey == "1") ? true : false;
 
-		if (LastKey.compare("noreply") == 0 && CurrentKey == "true")
-			NoReply = true;
+			if (LastKey.compare(W3HMC_ARG_CURL_NOREPLY) == 0)
+				*noReply = (CurrentKey == "1") ? true : false;
 
-		if (LastKey.compare("header") == 0) 
-			HeaderList = curl_slist_append(HeaderList, CurrentKey.c_str());
+			if (LastKey.compare(W3HMC_ARG_CURL_FOLLOWLOC) == 0)
+				FollowLocation = (CurrentKey == "1") ? true : false;
 
-		if (LastKey.compare("params") == 0)
-			ReqParams += CurrentKey;
+			if (LastKey.compare(W3HMC_ARG_CURL_ADDHEADER) == 0)
+				HeaderList = curl_slist_append(HeaderList, CurrentKey.c_str());
 
-		if (LastKey.compare("realm") == 0) 
-			ReqParams += "&hmc_realm=" + CurrentKey;
+			if (LastKey.compare(W3HMC_ARG_CURL_PARAMATERS) == 0)
+				ReqParams += CurrentKey;
 
-		if (LastKey.compare("hmcsec") == 0) 
-			ReqParams += "&hmc_secure=" + CurrentKey;
+			if (LastKey.compare(W3HMC_ARG_CURL_APPENDREALM) == 0 && CurrentKey != "1")
+				ReqParams += "&hmc_realm=" + CurrentKey;
 
-		if (LastKey.compare("player_name") == 0) 
-			ReqParams += "&hmc_playername=" + CurrentKey;
+			if (LastKey.compare(W3HMC_ARG_CURL_APPENDSECRET) == 0 && CurrentKey != "1")
+				ReqParams += "&hmc_secure=" + CurrentKey;
 
+			if (LastKey.compare(W3HMC_ARG_CURL_APPENDNAME) == 0 && CurrentKey != "1")
+				ReqParams += "&hmc_playername=" + CurrentKey;
+		}
+
+		isArgName = !isArgName;
 		LastKey = CurrentKey;
 	}
 
@@ -230,6 +258,9 @@ string W3HMC_CURLRequest( string args )
 	curl_easy_setopt(CURLHandle, CURLOPT_URL, URL.c_str());
 	curl_easy_setopt(CURLHandle, CURLOPT_WRITEFUNCTION, W3HMC_CURLWriteData);
 	curl_easy_setopt(CURLHandle, CURLOPT_WRITEDATA, &CURLStringBuffer);
+
+	if (FollowLocation)
+		curl_easy_setopt(CURLHandle, CURLOPT_FOLLOWLOCATION, 1L);
 
 	if (HeaderList != NULL)
 		curl_easy_setopt(CURLHandle, CURLOPT_HTTPHEADER, HeaderList);
@@ -253,9 +284,6 @@ string W3HMC_CURLRequest( string args )
 
     curl_easy_cleanup(CURLHandle);
 
-    if (NoReply)
-    	Result = "noreply";
-    
 	return Result;
 }
 
@@ -263,10 +291,10 @@ void CCURLCallableDoCURL :: operator( )( )
 {
 	CBaseCallable :: Init( );
 
-	m_Result = W3HMC_CURLRequest( m_Args );
+	m_Result = W3HMC_CURLRequest( m_Args, &m_NoReply );
 
 	// Clear arguments for the instance
-	((CGame*)m_Game)->m_GHost->m_W3HMC->m_Arguments.erase(GetReq());
+	((CGame*)m_Game)->m_GHost->m_W3HMC->m_Arguments.erase(GetReqID());
 
 	CBaseCallable :: Close( );
 }
@@ -339,7 +367,7 @@ bool CGHostW3HMC :: ProcessAction( CIncomingAction *Action )
 								int ReqID = atoi(ReqIDStr.c_str());
 
 								std::map<std::string, std::string> Arg = ParseArguments(m_Arguments[Instance]);
-								string ArgStr = "";
+								string ArgStr = m_Arguments[Instance];
 
 								switch(ReqID)
 								{
@@ -350,16 +378,14 @@ bool CGHostW3HMC :: ProcessAction( CIncomingAction *Action )
 
 									case W3HMC_REQUEST_HTTP:
 
-										if (Arg["realm"].compare("true") != 0)
-											ArgStr = m_Arguments[Instance];
-										else
-											ArgStr = m_Arguments[Instance] + " realm " + player->GetJoinedRealm();
+										if (Arg[W3HMC_ARG_CURL_APPENDREALM].compare("1") == 0)
+											ArgStr += " " + std::string(W3HMC_ARG_CURL_APPENDREALM) + " " + player->GetJoinedRealm();
 
-										if (Arg["player_name"].compare("true") == 0)
-											ArgStr += " player_name " + player->GetName(); // appends a second player_name (the latest gets used)
+										if (Arg[W3HMC_ARG_CURL_APPENDNAME].compare("1") == 0)
+											ArgStr += " " + std::string(W3HMC_ARG_CURL_APPENDNAME) + " " + player->GetName(); // appends a second player_name (the latest gets used)
 
-										if (Arg["secure"].compare("true") == 0)
-											ArgStr += " hmcsec " + m_Game->m_GHost->m_Map->GetMapW3HMCSecret();
+										if (Arg[W3HMC_ARG_CURL_APPENDSECRET].compare("1") == 0)
+											ArgStr += " " + std::string(W3HMC_ARG_CURL_APPENDSECRET) + " " + m_Game->m_GHost->m_Map->GetMapW3HMCSecret();
 
 										m_SyncOutgoing.push_back(m_Game->m_GHost->m_W3HMC->ThreadedCURL(Action, ArgStr, m_Game, Instance, ReqIDStr, ValueInt, Len));
 										m_Arguments[Instance] = "running";

@@ -33,6 +33,11 @@
 #include "socket.h"
 #include "ghostdb.h"
 #include "ghostdbmysql.h"
+
+#ifdef WIN32
+  #include "ghostdbsqlite.h"
+#endif
+
 #include "ghostw3hmc.h"
 #include "bnet.h"
 #include "map.h"
@@ -46,7 +51,9 @@
 #include "game.h"
 
 #include <signal.h>
-#include <execinfo.h> //to generate stack trace-like thing on exception
+#ifdef __linux__ 
+ #include <execinfo.h> //to generate stack trace-like thing on exception
+#endif
 #include <stdlib.h>
 
 #ifdef WIN32
@@ -140,14 +147,14 @@ void SignalCatcher( int s )
 
 void handler()
 {
-	void *trace_elems[20];
+	/*void *trace_elems[20];
 	int trace_elem_count(backtrace( trace_elems, 20 ));
 	char **stack_syms(backtrace_symbols( trace_elems, trace_elem_count ));
 	for ( int i = 0 ; i < trace_elem_count ; ++i )
 	{
 		std::cout << stack_syms[i] << "\n";
 	}
-	free( stack_syms );
+	free( stack_syms );*/
 
 	exit(1);
 }
@@ -392,7 +399,7 @@ CGHost :: CGHost( CConfig *CFG )
 	m_LocalSocket->SetDontRoute( CFG->GetInt( "udp_dontroute", 0 ) == 0 ? false : true );
 	m_ReconnectSocket = NULL;
 	m_GPSProtocol = new CGPSProtocol( );
-	m_GCBIProtocol = new CGCBIProtocol( );
+	//m_GCBIProtocol = new CGCBIProtocol( );
 	m_CRC = new CCRC32( );
 	m_CRC->Initialize( );
 	m_SHA = new CSHA1( );
@@ -405,7 +412,16 @@ CGHost :: CGHost( CConfig *CFG )
 	
 	CONSOLE_Print( "[GHOST] opening primary database" );
 
-	m_DB = new CGHostDBMySQL( CFG );
+	string DBType = CFG->GetString("db_type", "sqlite3");
+
+	if (DBType == "mysql")
+		m_DB = new CGHostDBMySQL(CFG);
+	else
+#ifndef GHOSTDBSQLITE_H
+		m_DB = new CGHostDBMySQL(CFG);
+#else
+		m_DB = new CGHostDBSQLite(CFG);
+#endif
 
 	if (CFG->GetInt( "bot_w3hmc", 0 ) == 1)
 		m_W3HMC = new CGHostW3HMC( CFG );
@@ -664,7 +680,7 @@ CGHost :: CGHost( CConfig *CFG )
 	}
 
 	CONSOLE_Print( "[GHOST] Loading GeoIP data" );
-	m_GeoIP = GeoIP_open( m_GeoIPFile.c_str( ), GEOIP_STANDARD | GEOIP_CHECK_CACHE );
+	m_GeoIP = GeoIP_open(m_GeoIPFile.c_str(), GEOIP_STANDARD | GEOIP_CHECK_CACHE);
 
 	if( m_GeoIP == NULL )
 		CONSOLE_Print( "[GHOST] GeoIP: error opening database" );
@@ -684,7 +700,7 @@ CGHost :: ~CGHost( )
 		delete *i;
 
 	delete m_GPSProtocol;
-	delete m_GCBIProtocol;
+	//delete m_GCBIProtocol;
 	delete m_CRC;
 	delete m_SHA;
 
@@ -733,7 +749,8 @@ bool CGHost :: Update( long usecBlock )
 		if( (*i)->readyDelete( ) )
 		{
 			delete *i;
-			m_Games.erase( i );
+			i = m_Games.erase(i);
+
 		} else {
 			++i;
 		}
@@ -1736,7 +1753,7 @@ string CGHost :: FromCheck( string ip )
 {
 	if( m_GeoIP != NULL )
 	{
-		const char *returnedCountry = GeoIP_country_code_by_addr( m_GeoIP, ip.c_str( ) );
+		const char *returnedCountry = GeoIP_country_code_by_addr(m_GeoIP, ip.c_str());
 
 		if( returnedCountry != NULL )
 		{

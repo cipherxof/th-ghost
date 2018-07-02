@@ -51,7 +51,6 @@ class CConfig;
 class CCallableCommandList;
 class CCallableSpoofList;
 struct DenyInfo;
-struct HostNameInfo;
 
 struct GProxyReconnector {
 	CTCPSocket *socket;
@@ -59,6 +58,11 @@ struct GProxyReconnector {
 	uint32_t ReconnectKey;
 	uint32_t LastPacket;
 	uint32_t PostedTime;
+};
+
+struct HostNameInfo {
+	string ip;
+	string hostname;
 };
 
 class CGHost
@@ -241,11 +245,6 @@ struct DenyInfo {
 	uint32_t Time;
 	uint32_t Duration;
 	uint32_t Count;
-};
-
-struct HostNameInfo {
-	string ip;
-	string hostname;
 };
 
 #endif
