@@ -1,7 +1,9 @@
 # th-ghost
-Warcraft III Hosting Bot modified from [ghostplusplus](https://code.google.com/archive/p/ghostplusplus/source) and [ent-ghost](https://github.com/uakfdotb/ent-ghost) with support for [W3HMC](https://github.com/triggerhappy187/th-ghost/wiki/W3HMC).
+Warcraft III Hosting Bot modified from [ghostplusplus](https://code.google.com/archive/p/ghostplusplus/source) and [ent-ghost](https://github.com/uakfdotb/ent-ghost) with support for [W3HMC](https://github.com/triggerhappy187/th-ghost/wiki/W3HMC). In short, it provides new functionality to custom maps. 
 
-https://github.com/triggerhappy187/th-ghost/wiki
+[Read the wiki](https://github.com/triggerhappy187/th-ghost/wiki).
+
+![In-Game](https://i.imgur.com/Q6eANRR.png)
 
 Windows
 ==========
@@ -29,4 +31,4 @@ make
 ```
 Running:
 
-MySQL is currently required on Linux for the bot. This means you will need to setup MySQL on your machine and run the provided SQL scripts ([install.sql](https://github.com/triggerhappy187/th-ghost/blob/master/ghost/install.sql) & [mysql_create_tables_v2.sql](https://github.com/triggerhappy187/th-ghost/blob/master/mysql_create_tables_v2.sql)) as well as configure your MySQL info in default.cfg.
+MySQL may be required on Linux for the bot. This means you might need to setup MySQL on your machine and run the provided SQL scripts ([install.sql](https://github.com/triggerhappy187/th-ghost/blob/master/ghost/install.sql) & [mysql_create_tables_v2.sql](https://github.com/triggerhappy187/th-ghost/blob/master/mysql_create_tables_v2.sql)) as well as configure your MySQL info in default.cfg.
