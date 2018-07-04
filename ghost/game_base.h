@@ -27,6 +27,7 @@
 #define GAME_BASE_H
 
 #include "gameslot.h"
+#include <time.h>
 
 //
 // CBaseGame
@@ -57,6 +58,7 @@ public:
 	vector<CGamePlayer *> m_Players;				// vector of players
 	vector<CGameSlot> m_Slots;						// vector of slots
 	queue<CIncomingAction *> m_Actions;				// queue of actions to be sent
+	time_t m_FinishedLoadingTime;
 
 protected:
 	CTCPServer *m_Socket;							// listening socket

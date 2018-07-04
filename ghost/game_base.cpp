@@ -933,6 +933,10 @@ bool CBaseGame :: Update( void *fd, void *send_fd )
 
 		if( FinishedLoading )
 		{
+			m_FinishedLoadingTime = time(0);
+			struct tm tstruct;
+			tstruct = *localtime(&m_FinishedLoadingTime);
+
 			m_LastActionSentTicks = GetTicks( );
 			m_GameLoading = false;
 			m_GameLoaded = true;

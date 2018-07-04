@@ -57,33 +57,54 @@ bool CBNCSUtilInterface :: HELP_SID_AUTH_CHECK( bool TFT, string war3Path, strin
 {
 	// set m_EXEVersion, m_EXEVersionHash, m_EXEInfo, m_InfoROC, m_InfoTFT
 
-	string FileWar3EXE = war3Path + "war3.exe";
+	string FileWar3EXEA = war3Path + "war3.exe";
+	string FileWar3EXEB = war3Path + "Warcraft III.exe";
 	string FileStormDLL = war3Path + "Storm.dll";
 
 	if( !UTIL_FileExists( FileStormDLL ) )
 		FileStormDLL = war3Path + "storm.dll";
 
 	string FileGameDLL = war3Path + "game.dll";
-	bool ExistsWar3EXE = UTIL_FileExists( FileWar3EXE );
+	bool ExistsWar3EXEA = UTIL_FileExists( FileWar3EXEA );
+	bool ExistsWar3EXEB = UTIL_FileExists( FileWar3EXEB );
 	bool ExistsStormDLL = UTIL_FileExists( FileStormDLL );
 	bool ExistsGameDLL = UTIL_FileExists( FileGameDLL );
 
-	if( ExistsWar3EXE /*&& ExistsStormDLL && ExistsGameDLL*/ )
+	if( ExistsWar3EXEA || ExistsWar3EXEB )
 	{
 		// todotodo: check getExeInfo return value to ensure 1024 bytes was enough
-
 		char buf[1024];
+		uint32_t EXEVersionHash;
 		uint32_t EXEVersion;
-		getExeInfo( FileWar3EXE.c_str( ), (char *)&buf, 1024, (uint32_t *)&EXEVersion, BNCSUTIL_PLATFORM_X86 );
+
+		if ( ExistsWar3EXEB )
+		{
+			CONSOLE_Print("[BNCSUI] using Warcraft III.exe");
+
+			getExeInfo(FileWar3EXEB.c_str(), (char *)&buf, 1024, (uint32_t *)&EXEVersion, BNCSUTIL_PLATFORM_X86);
+
+			const char* files[] = { FileWar3EXEB.c_str() };
+			checkRevision(valueStringFormula.c_str(), files, 1, extractMPQNumber(mpqFileName.c_str()), (unsigned long *)&EXEVersionHash);
+			m_EXEVersionHash = UTIL_CreateByteArray(EXEVersionHash, false);
+		}
+		else if ( ExistsWar3EXEA)
+		{
+			CONSOLE_Print("[BNCSUI] using war3.exe");
+
+			if (!ExistsStormDLL)
+				CONSOLE_Print("[BNCSUI] unable to open [" + FileStormDLL + "]");
+
+			if (!ExistsGameDLL)
+				CONSOLE_Print("[BNCSUI] unable to open [" + FileGameDLL + "]");
+
+			getExeInfo(FileWar3EXEA.c_str(), (char *)&buf, 1024, (uint32_t *)&EXEVersion, BNCSUTIL_PLATFORM_X86);
+
+			checkRevisionFlat(valueStringFormula.c_str(), FileWar3EXEA.c_str(), FileStormDLL.c_str(), FileGameDLL.c_str(), extractMPQNumber(mpqFileName.c_str()), (unsigned long *)&EXEVersionHash);
+			m_EXEVersionHash = UTIL_CreateByteArray(EXEVersionHash, false);
+		}
+
 		m_EXEInfo = buf;
-		m_EXEVersion = UTIL_CreateByteArray( EXEVersion, false );
-		unsigned long EXEVersionHash;
-
-		const char* files[] = { FileWar3EXE.c_str() };
-
-		checkRevision(valueStringFormula.c_str(), files, 1, extractMPQNumber(mpqFileName.c_str()), (unsigned long *)&EXEVersionHash);
-
-		m_EXEVersionHash = UTIL_CreateByteArray((uint32_t)EXEVersionHash, false);
+		m_EXEVersion = UTIL_CreateByteArray(EXEVersion, false);
 
 		m_KeyInfoROC = CreateKeyInfo( keyROC, UTIL_ByteArrayToUInt32( clientToken, false ), UTIL_ByteArrayToUInt32( serverToken, false ) );
 
@@ -103,14 +124,7 @@ bool CBNCSUtilInterface :: HELP_SID_AUTH_CHECK( bool TFT, string war3Path, strin
 	}
 	else
 	{
-		if( !ExistsWar3EXE )
-			CONSOLE_Print( "[BNCSUI] unable to open [" + FileWar3EXE + "]" );
-
-		if( !ExistsStormDLL )
-			CONSOLE_Print( "[BNCSUI] unable to open [" + FileStormDLL + "]" );
-
-		if( !ExistsGameDLL )
-			CONSOLE_Print( "[BNCSUI] unable to open [" + FileGameDLL + "]" );
+		CONSOLE_Print( "[BNCSUI] unable to open [" + FileWar3EXEA + "] or " + "[" + FileWar3EXEB + "]");
 	}
 
 	return false;

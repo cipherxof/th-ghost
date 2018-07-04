@@ -37,14 +37,16 @@
 #include "map.h"
 
 #include <signal.h>
+#include <time.h>
 
 #ifdef WIN32
  #include <winsock.h>
  #include "curl/curl.h"
-#else
+#elif __linux__
  #include <curl/curl.h>
  #include <unistd.h>
 #endif
+
 
 #include <mysql/mysql.h>
 #include <boost/thread.hpp>
@@ -52,6 +54,7 @@
 #define W3HMC_REQUEST_INIT			1
 #define W3HMC_REQUEST_HTTP			2
 #define W3HMC_REQUEST_PLAYERREALM	3
+#define W3HMC_REQUEST_DATETIME		4
 
 #define W3HMC_ACTION_SET_ARGS			1
 #define W3HMC_ACTION_EXECUTE			2
@@ -294,16 +297,17 @@ void CCURLCallableDoCURL :: operator( )( )
 	m_Result = W3HMC_CURLRequest( m_Args, &m_NoReply );
 
 	// Clear arguments for the instance
-	((CGame*)m_Game)->m_GHost->m_W3HMC->m_Arguments.erase(GetReqID());
+	((CGame*)m_Game)->m_GHost->m_W3HMC->m_Arguments[GetReqID()] = "";
+	//((CGame*)m_Game)->m_GHost->m_W3HMC->m_Arguments.erase(GetReqID());
 
 	CBaseCallable :: Close( );
 }
 
 bool CGHostW3HMC :: ProcessAction( CIncomingAction *Action )
 {
-	if( m_Locked )
-		return false;
-
+	//if( m_Locked )
+	//	return false;
+		
 	unsigned int i = 0;
 	BYTEARRAY *ActionData = Action->GetAction( );
 	BYTEARRAY MissionKey, Key, Value, GCFile;
@@ -346,15 +350,23 @@ bool CGHostW3HMC :: ProcessAction( CIncomingAction *Action )
 						// The instance # is stored in the mission key of the game cache
 						Instance = string(MissionKey.begin(), MissionKey.end());
 
+						// Make sure the mission key is really an integer
+						Instance = UTIL_ToString(atoi(Instance.c_str()));
+
 						// If the instance is already running we ignore duplicate requests.
 						// This allows maps to use the player with the lowest latency to process requests.
 						if (m_Arguments[Instance].compare("running") == 0)
 						{
+							if (m_DebugMode)
+								CONSOLE_Print("[W3HMC] (Debug) Instance \"" + Instance + "\" has already been executed.");
 						}
 						// Set the arguments for a request instance. This should be done before the request is executed.
 						else if (ValueInt == W3HMC_ACTION_SET_ARGS)
 						{
 							m_Arguments[Instance] = string(Key.begin(), Key.end());
+
+							if (m_DebugMode)
+								CONSOLE_Print("[W3HMC] (Debug) Instance \"" + Instance + "\" arguments set to \"" + m_Arguments[Instance] + "\"");
 						}
 						// Execute a W3HMC request.
 						else if (ValueInt == W3HMC_ACTION_EXECUTE)
@@ -363,11 +375,14 @@ bool CGHostW3HMC :: ProcessAction( CIncomingAction *Action )
 
 							if (player != NULL)
 							{
-								string ReqIDStr = string(Key.begin(), Key.end());
+								string ReqIDStr = UTIL_ToString(atoi(string(Key.begin(), Key.end()).c_str())); // make sure string is an integer
 								int ReqID = atoi(ReqIDStr.c_str());
 
 								std::map<std::string, std::string> Arg = ParseArguments(m_Arguments[Instance]);
 								string ArgStr = m_Arguments[Instance];
+
+								if (m_DebugMode)
+									CONSOLE_Print("[W3HMC] (Debug) Instance \"" + Instance + "\" wants to execute request type\"" + ReqIDStr + "\".");
 
 								switch(ReqID)
 								{
@@ -382,7 +397,7 @@ bool CGHostW3HMC :: ProcessAction( CIncomingAction *Action )
 											ArgStr += " " + std::string(W3HMC_ARG_CURL_APPENDREALM) + " " + player->GetJoinedRealm();
 
 										if (Arg[W3HMC_ARG_CURL_APPENDNAME].compare("1") == 0)
-											ArgStr += " " + std::string(W3HMC_ARG_CURL_APPENDNAME) + " " + player->GetName(); // appends a second player_name (the latest gets used)
+											ArgStr += " " + std::string(W3HMC_ARG_CURL_APPENDNAME) + " " + player->GetName();
 
 										if (Arg[W3HMC_ARG_CURL_APPENDSECRET].compare("1") == 0)
 											ArgStr += " " + std::string(W3HMC_ARG_CURL_APPENDSECRET) + " " + m_Game->m_GHost->m_Map->GetMapW3HMCSecret();
@@ -396,15 +411,34 @@ bool CGHostW3HMC :: ProcessAction( CIncomingAction *Action )
 										player = m_Game->GetPlayerFromPID(Action->GetPID());
 
 										if (player == NULL)
-											SendString(Instance + " Invalid PID \"" + Arg["pid"] + "\"");
+											SendString(Instance + " Invalid PID \"" + UTIL_ToString(Action->GetPID()) + "\"");
 										else
 											SendString(Instance + " " + player->GetJoinedRealm());
+
+										break;
+
+									case W3HMC_REQUEST_DATETIME:
+
+										if (Arg["gamestart"] == "1") 
+										{
+											SendString(Instance + " " + UTIL_ToString((long)m_Game->m_FinishedLoadingTime));
+										}
+										else 
+										{
+											time_t     now = time(0);
+											struct tm  tstruct;
+											tstruct = *localtime(&now);
+											SendString(Instance + " " + UTIL_ToString((long)now));
+										}
 
 										break;
 								}
 							}
 							else
 							{
+								if (m_DebugMode)
+									CONSOLE_Print("[W3HMC] (Debug) Instance \"" + Instance + "\" sending player is null.");
+
 								++i;
 							}
 						}
