@@ -80,6 +80,8 @@ CGHostW3HMC :: CGHostW3HMC( CConfig *CFG )
 	m_DebugMode = (CFG->GetInt( "bot_w3hmcdebug", 0 ) == 1);
 	m_OutstandingCallables = 0;
 	m_Locked = false;
+
+	curl_global_init(CURL_GLOBAL_ALL);
 }
 
 CGHostW3HMC :: ~CGHostW3HMC( )
@@ -209,7 +211,6 @@ string W3HMC_CURLRequest( string args, bool *noReply )
 {
 	string Result = "";
 
-	curl_global_init(CURL_GLOBAL_ALL);
 	CURL* CURLHandle = curl_easy_init();
 	struct curl_slist *HeaderList = NULL;
 	string CURLStringBuffer;
@@ -298,7 +299,7 @@ void CCURLCallableDoCURL :: operator( )( )
 
 	// Clear arguments for the instance
 	((CGame*)m_Game)->m_GHost->m_W3HMC->m_Arguments[GetReqID()] = "";
-	//((CGame*)m_Game)->m_GHost->m_W3HMC->m_Arguments.erase(GetReqID());
+	((CGame*)m_Game)->m_GHost->m_W3HMC->m_Arguments.erase(GetReqID());
 
 	CBaseCallable :: Close( );
 }
@@ -425,10 +426,12 @@ bool CGHostW3HMC :: ProcessAction( CIncomingAction *Action )
 										}
 										else 
 										{
-											time_t     now = time(0);
-											struct tm  tstruct;
-											tstruct = *localtime(&now);
+											time_t now = time(0);
+											struct tm *tstruct = new tm(*localtime(&now));
+
 											SendString(Instance + " " + UTIL_ToString((long)now));
+
+											delete tstruct;
 										}
 
 										break;
