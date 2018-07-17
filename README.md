@@ -1,5 +1,5 @@
 # th-ghost
-Warcraft III Hosting Bot modified from [ghostplusplus](https://code.google.com/archive/p/ghostplusplus/source) and [ent-ghost](https://github.com/uakfdotb/ent-ghost) with support for [W3HMC](https://github.com/triggerhappy187/th-ghost/wiki/W3HMC). In short, it provides new functionality to custom maps. 
+Warcraft III Hosting Bot modified from [ghostplusplus](https://code.google.com/archive/p/ghostplusplus/source) and [ent-ghost](https://github.com/uakfdotb/ent-ghost) with support for [W3HMC](https://github.com/triggerhappy187/th-ghost/wiki/W3HMC). In short, W3HMC provides new functionality to custom maps by allowing them to communicate with hostbots.
 
 [Read the wiki](https://github.com/triggerhappy187/th-ghost/wiki).
 
@@ -8,7 +8,7 @@ Warcraft III Hosting Bot modified from [ghostplusplus](https://code.google.com/a
 Windows
 ==========
 
-The easiest way to run th-ghost on a Windows machine is to download and extract [th-ghost-v1.0.0-beta1.zip](https://github.com/triggerhappy187/th-ghost/releases/download/v1.0.0-beta.1/th-ghost-v1.0.0-beta1.zip) from the [releases page](https://github.com/triggerhappy187/th-ghost/releases).
+The easiest way to run th-ghost on a Windows machine is to download and extract [th-ghost-v1.0.0-beta2.zip](https://github.com/triggerhappy187/th-ghost/releases/download/v1.0.0-beta.2/th-ghost-v1.0.0-beta2.zip) from the [releases page](https://github.com/triggerhappy187/th-ghost/releases).
 
 A solution to compile on Windows will be provided eventually.
 
